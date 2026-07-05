@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kitian // Monitor</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(0,229,255,.05), transparent 55%),
+      linear-gradient(180deg, #080f18 0%, #020508 100%);
+    color: #c8f5ff;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  canvas {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1; display: block;
+  }
+
+  .stage {
+    position: fixed; inset: 0;
+    z-index: 10; pointer-events: none;
+    display: flex; flex-direction: row;
+    padding: 14px; gap: 12px;
+  }
+
+  .stage > * {
+    pointer-events: auto;
+  }
+
+  .nav {
+    position: fixed;
+    left: 50%; top: 14px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    pointer-events: auto;
+  }
+
+  .nav .brand {
+    font-family: 'Share Tech Mono', Consolas, monospace;
+    font-size: 12px; letter-spacing: .14em;
+    color: rgba(0, 229, 255, .55);
+    padding: 8px 10px;
+  }
+
+  .nav button {
+    background: rgba(0, 0, 0, .25);
+    color: rgba(180, 235, 255, .5);
+    border: 1px solid rgba(0, 229, 255, .45);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 11px; font-family: inherit;
+    letter-spacing: .06em;
+    cursor: pointer;
+  }
+
+  .nav button.active {
+    color: rgba(0, 229, 255, .95);
+    border-color: rgba(0, 229, 255, .75);
+  }
+
+  .col {
+    width: 320px; min-width: 220px;
+    display: flex; flex-direction: column;
+    gap: 14px;
+    align-self: stretch;
+    transition: opacity .3s ease, width .3s ease;
+  }
+
+  .col.hide {
+    width: 0; opacity: 0; overflow: hidden; pointer-events: none;
+  }
+
+  .sidebar-left { }
+  .sidebar-right { margin-left: auto; }
+
+  .mono {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: rgba(0, 229, 255, .85);
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 10px;
+    letter-spacing: .18em;
+    color: rgba(0, 229, 255, .45);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .ok { color: rgba(0, 255, 136, .85); }
+  .warn { color: rgba(255, 107, 107, .85); }
+  .dim { color: rgba(180, 235, 255, .28); }
+
+  .footer {
+    position: fixed; left: 14px; right: 14px; bottom: 10px;
+    z-index: 15; font-size: 10px; color: rgba(180, 235, 255, .3);
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="nav">
+  <div class="brand">KITIAN // MONITOR</div>
+  <button data-view="system">SISTEMA</button>
+  <button data-view="core">NUCLEO</button>
+  <button data-view="emotional">EMOCIONAL</button>
+  <button data-view="director">DIRECTOR</button>
+  <button data-view="goals">OBJETIVOS</button>
+  <button data-view="files">ARCHIVOS</button>
+  <button data-view="nebula" class="active" id="btn-nebula">NEBULOSA</button>
+</div>
+
+<div class="stage" id="stage">
+  <div class="col sidebar-left" id="col-left">
+    <div>
+      <div class="label">SISTEMA</div>
+      <div class="mono" id="txt-left">-</div>
+    </div>
+  </div>
+
+  <div class="col sidebar-right" id="col-right">
+    <div>
+      <div class="label">ESTADO</div>
+      <div class="mono" id="txt-right">-</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer" id="footer">offline</div>
+
+<script>
+(() => {
+  const cvs = document.getElementById('bg');
+  const ctx = cvs.getContext('2d');
+  const $ = (id) => document.getElementById(id);
+
+  let W = 0, H = 0, dpr = 1;
+  let pts = [];
+  const N = 100;
+  let cpu = 0, ram = 0;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cvs.width = W * dpr; cvs.height = H * dpr;
+    cvs.style.width = W + 'px'; cvs.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function init() {
+    pts = [];
+    for (let i = 0; i < N; i++) {
+      pts.push({ x: Math.random() * W, y: Math.random() * H, r: 0.7 + Math.random() * 1.8 });
+    }
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // links
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+        const d = Math.hypot(dx, dy);
+        if (d < 120) {
+          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = `rgba(0,229,255,${(1 - d / 120) * 0.4})`; ctx.lineWidth = 0.5; ctx.stroke();
+        }
+      }
+    }
+
+    // nodes
+    for (const p of pts) {
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,229,255,0.9)'; ctx.fill();
+    }
+
+    // center label
+    ctx.save();
+    ctx.fillStyle = '#00e5ff'; ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 12;
+    ctx.font = 'bold 12px "Share Tech Mono", Consolas, monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('KITIAN // NEBULA', W / 2, H / 2);
+    ctx.restore();
+
+    requestAnimationFrame(frame);
+  }
+
+  async function api(p, opts = {}) {
+    const r = await fetch('/api' + p, { cache: 'no-store', ...opts });
+    const j = await r.json().catch(() => ({}));
+    return { ok: r.ok, status: r.status, data: j };
+  }
+
+  function fmtNum(v) { return typeof v === 'number' ? v.toFixed(1) : '-'; }
+
+  async function tick() {
+    try {
+      const h = await api('/health');
+      const s = await api('/system');
+      cpu = Number((s.data || {}).cpu || 0);
+      ram = Number((s.data || {}).ram || 0);
+
+      $('txt-left').textContent =
+`UPTIME ${typeof s.data.uptime === 'number' ? s.data.uptime + 's' : '-'}
+HOST ${s.data.hostname ?? '-'}
+OS ${s.data.os ?? '-'}
+CPU ${fmtNum(s.data.cpu)}%
+RAM ${fmtNum(s.data.ram)}%
+DISK ${fmtNum(s.data.disk)}%
+DOWN ${s.data.net_down ?? '-'}
+UP ${s.data.net_up ?? '-'}
+CORES ${s.data.cpu_count ?? '-'}`;
+
+      const stress = cpu > 85 || ram > 90;
+      $('txt-right').innerHTML =
+`<span class="${stress ? 'warn' : 'ok'}">${(h.data.health || '-').toUpperCase()}</span>
+CPU ${fmtNum(cpu)}%
+RAM ${fmtNum(ram)}%
+NET ${s.data.net_down ?? '-'} / ${s.data.net_up ?? '-'}
+HEALTH ${h.status}
+SYSTEM ${s.status}`;
+
+      $('footer').textContent = `online ${new Date().toLocaleTimeString()} | KITIAN // NEBULA`;
+    } catch (e) {
+      $('txt-left').textContent = 'SIN DATOS';
+      $('txt-right').textContent = 'OFFLINE';
+      $('footer').textContent = 'offline';
+    }
+  }
+
+  function setView(name) {
+    const left = $('col-left');
+    const right = $('col-right');
+    if (name === 'nebula') {
+      left.classList.add('hide');
+      right.classList.add('hide');
+      $('btn-nebula').classList.add('active');
+    } else {
+      left.classList.remove('hide');
+      right.classList.remove('hide');
+      $('btn-nebula').classList.remove('active');
+    }
+    document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  }
+
+  document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  window.addEventListener('resize', () => { resize(); init(); });
+  resize(); init();
+  setView('nebula');
+  frame();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>

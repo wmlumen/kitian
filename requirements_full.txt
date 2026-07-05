@@ -1,0 +1,39 @@
+# Core
+openai>=1.0.0
+psutil>=5.9.0
+python-dotenv>=1.0.0
+numpy>=1.26.0
+
+# Voz - STT
+SpeechRecognition>=3.10.0
+faster-whisper>=1.1.0
+
+# Voz - TTS
+pyttsx3>=2.9.0
+piper-tts>=1.2.0
+onnxruntime>=1.16.0
+
+# Voz - VAD / WakeWord
+silero-vad>=0.1.0
+openwakeword>=0.5.0
+
+# A...[truncated]
+sounddevice>=0.5.0
+
+# Input / Hotkeys
+keyboard>=0.13.0
+
+# Conectividad
+python-telegram-bot>=20.0
+google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.2.0
+flask>=2.3.0
+
+# Desktop control
+pyautogui>=0.9.54
+pygetwindow>=0.0.9
+comtypes>=1.4.0
+pycaw>=20230402
+
+# Util
+requests>=2.31.0

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red del Conocimiento - Kitian</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; color: #c0c0d0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+  #graph { width: 100vw; height: 100vh; }
+  #legend {
+    position: fixed; top: 16px; right: 16px; background: #12121aee; border: 1px solid #2a2a3a;
+    padding: 14px 18px; border-radius: 10px; font-size: 13px; z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+  #legend h3 { margin-bottom: 10px; color: #8ab4f8; letter-spacing: 1px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+  #info-panel {
+    position: fixed; bottom: 20px; left: 20px; right: 20px; background: #12121aee;
+    border: 1px solid #2a2a3a; padding: 14px 18px; border-radius: 10px;
+    display: none; z-index: 10; backdrop-filter: blur(8px); max-height: 200px; overflow-y: auto;
+  }
+  #info-panel h3 { color: #8ab4f8; margin-bottom: 6px; }
+  #stats {
+    position: fixed; top: 16px; left: 16px; background: #12121aee; border: 1px solid #2a2a3a;
+    padding: 14px 18px; border-radius: 10px; font-size: 13px; z-index: 10;
+    backdrop-filter: blur(8px);
+  }
+  #stats span { color: #8ab4f8; font-weight: bold; }
+  #search-box {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+  }
+  #search-box input {
+    background: #12121aee; border: 1px solid #2a2a3a; color: #c0c0d0; padding: 10px 16px;
+    border-radius: 20px; width: 280px; font-size: 14px; outline: none;
+    backdrop-filter: blur(8px); text-align: center;
+  }
+  #search-box input::placeholder { color: #555; }
+  #search-box input:focus { border-color: #8ab4f8; }
+  #loading {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    color: #8ab4f8; font-size: 18px; z-index: 20;
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">Cargando red...</div>
+
+<div id="search-box">
+  <input type="text" id="search" placeholder="Buscar nodo..." oninput="searchNode()">
+</div>
+
+<div id="stats">
+  Nodos: <span id="node-count">0</span><br>
+  Aristas: <span id="edge-count">0</span>
+</div>
+
+<div id="legend">
+  <h3>Elementos</h3>
+  <div class="legend-item"><div class="legend-dot" style="background:#4fc3f7"></div> Agua</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ef5350"></div> Fuego</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#81c784"></div> Tierra</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fff176"></div> Aire</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#b39ddb"></div> Desconocido</div>
+</div>
+
+<div id="info-panel"></div>
+
+<svg id="graph"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const svg = d3.select("#graph");
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+const colorMap = {
+  "Agua": "#4fc3f7",
+  "Fuego": "#ef5350",
+  "Tierra": "#81c784",
+  "Aire": "#fff176"
+};
+
+const g = svg.append("g");
+
+const zoom = d3.zoom()
+  .scaleExtent([0.1, 6])
+  .on("zoom", (event) => g.attr("transform", event.transform));
+
+svg.call(zoom);
+svg.call(zoom.transform, d3.zoomIdentity.translate(width/2, height/2));
+
+const simulation = d3.forceSimulation()
+  .force("link", d3.forceLink().id(d => d.id).distance(d => 120 / Math.sqrt(d.peso || 1)))
+  .force("charge", d3.forceManyBody().strength(d => -80 * Math.sqrt(d.fuerza || 1)))
+  .force("center", d3.forceCenter(0, 0))
+  .force("collision", d3.forceCollide().radius(d => 8 + (d.fuerza || 5) / 5));
+
+let link, node, label;
+
+function getColor(n) {
+  const tipo = n.tipo || n.label;
+  if (tipo in colorMap) return colorMap[tipo];
+  if (typeof tipo === 'string' && tipo.toLowerCase().includes('agua')) return colorMap["Agua"];
+  if (typeof tipo === 'string' && tipo.toLowerCase().includes('fuego')) return colorMap["Fuego"];
+  if (typeof tipo === 'string' && tipo.toLowerCase().includes('tierra')) return colorMap["Tierra"];
+  if (typeof tipo === 'string' && tipo.toLowerCase().includes('aire')) return colorMap["Aire"];
+  return colorMap["Agua"];
+}
+
+function getRadius(d) {
+  const f = d.fuerza || 10;
+  return 3 + f / 8;
+}
+
+function render(data) {
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("node-count").textContent = data.nodes.length;
+  document.getElementById("edge-count").textContent = data.edges.length;
+
+  g.selectAll("*").remove();
+
+  link = g.append("g").selectAll("line")
+    .data(data.edges)
+    .join("line")
+    .attr("stroke", d => {
+      const tipo = d.tipo || d.justificacion || "";
+      if (tipo.includes("opuesto") || tipo.includes("contrario")) return "#ef535088";
+      if (tipo.includes("simbol") || tipo.includes("oculta")) return "#b39ddb88";
+      return "#2a2a4a88";
+    })
+    .attr("stroke-width", d => Math.max(0.5, (d.peso || 3) / 4))
+    .attr("stroke-opacity", 0.5);
+
+  node = g.append("g").selectAll("circle")
+    .data(data.nodes)
+    .join("circle")
+    .attr("r", getRadius)
+    .attr("fill", getColor)
+    .attr("stroke", d => d3.color(getColor(d)).darker(0.6))
+    .attr("stroke-width", 1.5)
+    .attr("cursor", "pointer")
+    .on("click", (event, d) => showInfo(d, data))
+    .call(d3.drag()
+      .on("start", (event, d) => { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on("end", (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+    );
+
+  label = g.append("g").selectAll("text")
+    .data(data.nodes)
+    .join("text")
+    .text(d => d.label || d.id)
+    .attr("font-size", d => Math.max(8, (d.fuerza || 10) / 3 + 7))
+    .attr("fill", "#c0c0d0")
+    .attr("text-anchor", "middle")
+    .attr("dy", d => -getRadius(d) - 4)
+    .attr("pointer-events", "none")
+    .style("text-shadow", "0 0 6px #0a0a0f");
+
+  simulation.nodes(data.nodes);
+  simulation.force("link").links(data.edges);
+  simulation.alpha(1).restart();
+
+  simulation.on("tick", () => {
+    link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+    node.attr("cx", d => d.x).attr("cy", d => d.y);
+    label.attr("x", d => d.x).attr("y", d => d.y);
+  });
+}
+
+function showInfo(d, data) {
+  const panel = document.getElementById("info-panel");
+  const conexiones = data.edges.filter(e => e.from === d.id || e.to === d.id);
+  const entrantes = conexiones.filter(e => e.to === d.id);
+  const salientes = conexiones.filter(e => e.from === d.id);
+
+  panel.style.display = "block";
+  panel.innerHTML = `
+    <h3>${d.label || d.id}</h3>
+    <p><strong>Tipo:</strong> ${d.tipo || 'Sin clasificar'} |
+    <strong>Fuerza:</strong> ${d.fuerza || 'N/A'} |
+    <strong>Conexiones:</strong> ${conexiones.length}</p>
+    ${entrantes.length ? `<p><strong>Recibe de:</strong> ${entrantes.map(e => e.from).join(', ')}</p>` : ''}
+    ${salientes.length ? `<p><strong>Conecta a:</strong> ${salientes.map(e => e.to).join(', ')}</p>` : ''}
+    ${d.archivo ? `<p><strong>Fuente:</strong> ${d.archivo}</p>` : ''}
+    <p style="font-size:11px;color:#666;margin-top:8px;">Click fuera para cerrar</p>
+  `;
+
+  setTimeout(() => {
+    document.addEventListener("click", function close(e) {
+      if (!panel.contains(e.target) && e.target.tagName !== "circle") {
+        panel.style.display = "none";
+        document.removeEventListener("click", close);
+      }
+    });
+  }, 100);
+}
+
+function searchNode() {
+  const q = document.getElementById("search").value.toLowerCase();
+  node.attr("opacity", d => {
+    const label = (d.label || d.id || "").toLowerCase();
+    return q === "" || label.includes(q) ? 1 : 0.15;
+  });
+  label.attr("opacity", d => {
+    const label = (d.label || d.id || "").toLowerCase();
+    return q === "" || label.includes(q) ? 1 : 0.15;
+  });
+  link.attr("opacity", d => {
+    const from = (d.source.label || d.source.id || "").toLowerCase();
+    const to = (d.target.label || d.target.id || "").toLowerCase();
+    return q === "" || from.includes(q) || to.includes(q) ? 0.5 : 0.05;
+  });
+}
+
+fetch("datos_red.json")
+  .then(r => r.json())
+  .then(render)
+  .catch(() => {
+    document.getElementById("loading").textContent = "No se encontro datos_red.json. Ejecuta primero el escaneo.";
+  });
+
+window.addEventListener("resize", () => location.reload());
+</script>
+</body>
+</html>

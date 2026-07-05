@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kitian Health Monitor</title>
+  <style>
+    :root {
+      --bg: #03070c;
+      --panel: #07131b;
+      --panel2: #0b1d28;
+      --line: #14465a;
+      --text: #dffcff;
+      --muted: #77aebc;
+      --ok: #00ff88;
+      --warn: #ffd000;
+      --bad: #ff7a00;
+      --crit: #ff2a00;
+      --cyan: #00e5ff;
+      --unknown: #8b98a3;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(0,229,255,.12), transparent 36rem),
+        linear-gradient(180deg, #02050a 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+      min-height: 100vh;
+    }
+
+    .grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.035) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), rgba(0,0,0,.25));
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(3,7,12,.88);
+      backdrop-filter: blur(12px);
+      padding: 16px 22px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: .12em;
+      color: var(--cyan);
+      text-shadow: 0 0 16px rgba(0,229,255,.35);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button, .file-label {
+      background: #082331;
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 9px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      box-shadow: inset 0 0 18px rgba(0,229,255,.04);
+    }
+
+    button:hover, .file-label:hover {
+      border-color: var(--cyan);
+      color: white;
+    }
+
+    input[type="file"] { display: none; }
+
+    main {
+      width: min(1400px, calc(100% - 28px));
+      margin: 18px auto 34px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .top {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 850px) {
+      .top { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(11,29,40,.92), rgba(7,19,27,.92));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 0 40px rgba(0,0,0,.28), inset 0 0 22px rgba(0,229,255,.035);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 3px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: .75;
+    }
+
+    .score-wrap {
+      display: grid;
+      place-items: center;
+      min-height: 250px;
+      text-align: center;
+    }
+
+    .ring {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--cyan) 0deg, rgba(255,255,255,.05) 0deg);
+      box-shadow: 0 0 35px rgba(0,229,255,.12);
+      position: relative;
+    }
+
+    .ring::after {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      background: #06111a;
+      border: 1px solid rgba(0,229,255,.22);
+      border-radius: 50%;
+    }
+
+    .score {
+      position: relative;
+      z-index: 1;
+      font-size: 48px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .score small {
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .status-pill {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0,0,0,.18);
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--unknown);
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .metric {
+      border: 1px solid rgba(20,70,90,.75);
+      background: rgba(3,10,16,.58);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .metric .value {
+      margin-top: 8px;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      color: var(--cyan);
+      font-size: 14px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .components {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .components { grid-template-columns: 1fr; }
+    }
+
+    .component {
+      border: 1px solid rgba(20,70,90,.75);
+      border-radius: 13px;
+      padding: 13px;
+      background: rgba(2,8,12,.45);
+    }
+
+    .component-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .component-name {
+      color: white;
+      font-weight: 700;
+    }
+
+    .badge {
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .checks {
+      margin: 9px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+
+    .checks li {
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid rgba(20,70,90,.38);
+      padding-top: 6px;
+    }
+
+    .tables {
+      display: grid;
+      grid-template-columns: 1.4fr .8fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .tables { grid-template-columns: 1fr; }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid rgba(20,70,90,.55);
+      padding: 9px 8px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--cyan);
+      font-weight: 700;
+      background: rgba(0,229,255,.04);
+      position: sticky;
+      top: 75px;
+    }
+
+    td {
+      color: #c9edf4;
+    }
+
+    .scroll {
+      max-height: 470px;
+      overflow: auto;
+      border: 1px solid rgba(20,70,90,.55);
+      border-radius: 12px;
+    }
+
+    .recommendations {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .recommendations li {
+      border: 1px solid rgba(20,70,90,.55);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(0,0,0,.16);
+      color: #c9edf4;
+      font-size: 12px;
+    }
+
+    .manual-form {
+      display: grid;
+      gap: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #031018;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    .footer {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .degraded { color: var(--bad); }
+    .critical { color: var(--crit); }
+    .unknown { color: var(--unknown); }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="grid"></div>
+
+  <header>
+    <div class="header-row">
+      <div>
+        <h1>KITIAN HEALTH MONITOR</h1>
+        <div class="subtitle" id="subtitle">Esperando datos de kitian_health.json</div>
+      </div>
+      <div class="actions">
+        <button id="reloadBtn">Recargar JSON</button>
+        <label class="file-label" for="fileInput">Cargar JSON</label>
+        <input id="fileInput" type="file" accept="application/json,.json" />
+        <button id="exportBtn">Exportar JSON</button>
+        <button id="copyBtn">Copiar resumen</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="top">
+      <div class="card score-wrap">
+        <div class="ring" id="scoreRing">
+          <div class="score"><span id="scoreValue">--</span><small>/100</small></div>
+        </div>
+        <div class="status-pill"><span class="dot" id="statusDot"></span><span id="statusText">UNKNOWN</span></div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Telemetría general</h2>
+        <div class="metrics">
+          <div class="metric"><div class="label">CPU</div><div class="value" id="cpuMetric">--</div></div>
+          <div class="metric"><div class="label">RAM</div><div class="value" id="ramMetric">--</div></div>
+          <div class="metric"><div class="label">Disco</div><div class="value" id="diskMetric">--</div></div>
+          <div class="metric"><div class="label">Anomalías abiertas</div><div class="value" id="anomMetric">--</div></div>
+          <div class="metric"><div class="label">Componentes OK</div><div class="value" id="compMetric">--</div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Resumen</div>
+          <div class="value" style="font-size:15px; line-height:1.45;" id="summaryText">Sin datos cargados.</div>
+        </div>
+        <div class="footer" id="envText"></div>
+      </div>
+    </section>
+
+    <section class="components" id="components"></section>
+
+    <section class="tables">
+      <div class="card">
+        <h2 class="section-title">Historial de anomalías <span id="anomalyCount"></span></h2>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Severidad</th>
+                <th>Componente</th>
+                <th>Anomalía</th>
+                <th>Recomendación</th>
+                <th>Visto</th>
+              </tr>
+            </thead>
+            <tbody id="anomalyTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">Correcciones sugeridas</h2>
+        <ul class="recommendations" id="recommendations"></ul>
+
+        <h2 class="section-title" style="margin-top:18px;">Registrar anomalía manual</h2>
+        <div class="manual-form">
+          <select id="manualSeverity">
+            <option>LOW</option>
+            <option selected>MEDIUM</option>
+            <option>HIGH</option>
+            <option>CRITICAL</option>
+          </select>
+          <input id="manualComponent" placeholder="Componente, ej. HUD" />
+          <input id="manualTitle" placeholder="Título de la anomalía" />
+          <textarea id="manualDetail" placeholder="Detalle / evidencia"></textarea>
+          <textarea id="manualRecommendation" placeholder="Recomendación futura"></textarea>
+          <button id="addManualBtn">Agregar al JSON local</button>
+        </div>
+        <div class="footer">
+          Nota: el navegador no puede guardar silenciosamente sobre el archivo local.
+          Usa “Exportar JSON” o ejecuta el probe Python para actualizar kitian_health.json.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const fallbackData = {
+      app: "Kitian",
+      schema_version: "1.0",
+      generated_at: "",
+      status: "UNKNOWN",
+      score: 0,
+      summary: "No se pudo cargar kitian_health.json. Usa el botón Cargar JSON o sirve la carpeta con python -m http.server.",
+      environment: {},
+      metrics: {},
+      components: [],
+      anomalies: [],
+      recommendations: [
+        "Ejecuta: python kitian_health_probe.py",
+        "Para lectura automática en navegador: python -m http.server 8080 y abre http://localhost:8080/kitian_health_dashboard.html"
+      ]
+    };
+
+    let healthData = structuredClone(fallbackData);
+
+    function statusClass(status) {
+      const s = String(status || "UNKNOWN").toUpperCase();
+      if (s === "OK") return "ok";
+      if (s === "WARN") return "warn";
+      if (s === "DEGRADED") return "degraded";
+      if (s === "CRITICAL") return "critical";
+      return "unknown";
+    }
+
+    function statusColor(status) {
+      const s = String(status || "UNKNOWN").toUpperCase();
+      if (s === "OK") return "var(--ok)";
+      if (s === "WARN") return "var(--warn)";
+      if (s === "DEGRADED") return "var(--bad)";
+      if (s === "CRITICAL") return "var(--crit)";
+      return "var(--unknown)";
+    }
+
+    function fmtPercent(v) {
+      if (v === null || v === undefined || Number.isNaN(Number(v))) return "--";
+      return `${Number(v).toFixed(1)}%`;
+    }
+
+    function openAnomalies(data) {
+      return (data.anomalies || []).filter(a => (a.status || "OPEN") === "OPEN");
+    }
+
+    function render(data) {
+      healthData = data || fallbackData;
+      const score = Math.max(0, Math.min(100, Number(healthData.score || 0)));
+      const status = String(healthData.status || "UNKNOWN").toUpperCase();
+      const color = statusColor(status);
+
+      document.getElementById("subtitle").textContent =
+        `${healthData.app || "Kitian"} · generado: ${healthData.generated_at || "sin fecha"} · schema ${healthData.schema_version || "--"}`;
+
+      document.getElementById("scoreValue").textContent = score;
+      document.getElementById("scoreRing").style.background =
+        `conic-gradient(${color} ${score * 3.6}deg, rgba(255,255,255,.06) 0deg)`;
+      document.getElementById("statusText").textContent = status;
+      document.getElementById("statusText").className = statusClass(status);
+      document.getElementById("statusDot").style.background = color;
+      document.getElementById("statusDot").style.color = color;
+
+      const m = healthData.metrics || {};
+      document.getElementById("cpuMetric").textContent = fmtPercent(m.cpu_percent);
+      document.getElementById("ramMetric").textContent = fmtPercent(m.ram_percent);
+      document.getElementById("diskMetric").textContent = fmtPercent(m.disk_percent);
+
+      const anomalies = openAnomalies(healthData);
+      const components = healthData.components || [];
+      const okComponents = components.filter(c => String(c.status).toUpperCase() === "OK").length;
+
+      document.getElementById("anomMetric").textContent = anomalies.length;
+      document.getElementById("compMetric").textContent = `${okComponents}/${components.length}`;
+      document.getElementById("summaryText").textContent = healthData.summary || "Sin resumen.";
+
+      const env = healthData.environment || {};
+      document.getElementById("envText").textContent =
+        `Host: ${env.host || "--"} · Plataforma: ${env.platform || "--"} · Python: ${env.python || "--"} · Base: ${env.base_dir || "--"}`;
+
+      renderComponents(components);
+      renderAnomalies(healthData.anomalies || []);
+      renderRecommendations(healthData.recommendations || []);
+    }
+
+    function renderFileModeHint() {
+      if (location.protocol !== "file:") return;
+      fallbackData.generated_at = new Date().toISOString().replace("T", " ").slice(0, 19);
+      fallbackData.summary =
+        "Vista local cargada. El navegador puede bloquear la lectura automática de kitian_health.json desde file://. Usa Cargar JSON o abre este dashboard por http://localhost:8080.";
+      fallbackData.recommendations = [
+        "Opción 1: python -m http.server 8080 y abre http://localhost:8080/kitian_health_dashboard.html",
+        "Opción 2: usa el botón Cargar JSON y elige kitian_health.json",
+        "Opción 3: ejecuta python kitian_health_probe.py para regenerar el snapshot"
+      ];
+      render(fallbackData);
+    }
+
+    function renderComponents(components) {
+      const root = document.getElementById("components");
+      root.innerHTML = "";
+
+      if (!components.length) {
+        root.innerHTML = `<div class="card">Sin componentes cargados.</div>`;
+        return;
+      }
+
+      components.forEach(c => {
+        const status = String(c.status || "UNKNOWN").toUpperCase();
+        const cls = statusClass(status);
+        const checks = (c.checks || []).map(ch => {
+          const ok = ch.ok ? "✓" : "!";
+          const ccls = ch.ok ? "ok" : statusClass(ch.severity === "HIGH" ? "DEGRADED" : ch.severity);
+          return `<li><span class="${ccls}">${ok}</span> ${escapeHtml(ch.name || "check")}: ${escapeHtml(ch.message || "")}</li>`;
+        }).join("");
+
+        const el = document.createElement("div");
+        el.className = "component";
+        el.innerHTML = `
+          <div class="component-head">
+            <div class="component-name">${escapeHtml(c.name || "Componente")}</div>
+            <span class="badge ${cls}">${status}</span>
+          </div>
+          <div style="color:var(--muted);font-size:12px;">${escapeHtml(c.message || "")}</div>
+          <ul class="checks">${checks || "<li>Sin checks registrados.</li>"}</ul>
+        `;
+        root.appendChild(el);
+      });
+    }
+
+    function renderAnomalies(anomalies) {
+      const tbody = document.getElementById("anomalyTable");
+      const count = document.getElementById("anomalyCount");
+      tbody.innerHTML = "";
+      count.textContent = `(${anomalies.length})`;
+
+      if (!anomalies.length) {
+        tbody.innerHTML = `<tr><td colspan="5">Sin anomalías registradas.</td></tr>`;
+        return;
+      }
+
+      anomalies.forEach(a => {
+        const sev = String(a.severity || "LOW").toUpperCase();
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="badge ${statusClass(sev === "HIGH" ? "DEGRADED" : sev)}">${escapeHtml(sev)}</span></td>
+          <td>${escapeHtml(a.component || "--")}<br><small>${escapeHtml(a.source || "")}</small></td>
+          <td><strong>${escapeHtml(a.title || "--")}</strong><br><small>${escapeHtml(a.detail || "")}</small></td>
+          <td>${escapeHtml(a.recommendation || "--")}</td>
+          <td><small>Primera: ${escapeHtml(a.first_seen || "--")}<br>Última: ${escapeHtml(a.last_seen || "--")}<br>Hits: ${escapeHtml(a.hits || 1)} · ${escapeHtml(a.status || "OPEN")}</small></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderRecommendations(items) {
+      const root = document.getElementById("recommendations");
+      root.innerHTML = "";
+      if (!items.length) {
+        root.innerHTML = "<li>Sin recomendaciones.</li>";
+        return;
+      }
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        root.appendChild(li);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function loadJson() {
+      try {
+        const url = `kitian_health.json?ts=${Date.now()}`;
+        const resp = await fetch(url, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        render(data);
+      } catch (err) {
+        console.warn("No se pudo cargar kitian_health.json:", err);
+        render(healthData && healthData.app ? healthData : fallbackData);
+      }
+    }
+
+    function downloadJson() {
+      const blob = new Blob([JSON.stringify(healthData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      const stamp = new Date().toISOString().replaceAll(":", "-").slice(0, 19);
+      a.href = URL.createObjectURL(blob);
+      a.download = `kitian_health_${stamp}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function addManualAnomaly() {
+      const component = document.getElementById("manualComponent").value.trim() || "Manual";
+      const severity = document.getElementById("manualSeverity").value.trim() || "MEDIUM";
+      const title = document.getElementById("manualTitle").value.trim();
+      const detail = document.getElementById("manualDetail").value.trim();
+      const recommendation = document.getElementById("manualRecommendation").value.trim();
+
+      if (!title) {
+        alert("Escribe un título para la anomalía.");
+        return;
+      }
+
+      const idRaw = `${component}|${title}|manual`.toLowerCase();
+      const id = "manual_" + Math.abs([...idRaw].reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0));
+      const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+      healthData.anomalies = healthData.anomalies || [];
+      const existing = healthData.anomalies.find(a => a.id === id);
+      if (existing) {
+        existing.last_seen = now;
+        existing.hits = Number(existing.hits || 1) + 1;
+        existing.detail = detail;
+        existing.recommendation = recommendation;
+        existing.status = "OPEN";
+      } else {
+        healthData.anomalies.unshift({
+          id,
+          first_seen: now,
+          last_seen: now,
+          component,
+          severity,
+          title,
+          detail,
+          source: "manual",
+          recommendation,
+          status: "OPEN",
+          hits: 1
+        });
+      }
+
+      const open = openAnomalies(healthData);
+      healthData.generated_at = now;
+      healthData.summary = `${open.length} anomalía(s) abiertas. Cambios manuales pendientes de exportar.`;
+      healthData.score = Math.max(0, Number(healthData.score || 100) - 5);
+
+      render(healthData);
+    }
+
+    async function copySummary() {
+      const anomalies = openAnomalies(healthData);
+      const text = [
+        `Kitian Health Monitor`,
+        `Estado: ${healthData.status}`,
+        `Score: ${healthData.score}/100`,
+        `Generado: ${healthData.generated_at}`,
+        `Resumen: ${healthData.summary}`,
+        ``,
+        `Anomalías abiertas:`,
+        ...anomalies.slice(0, 10).map(a => `- [${a.severity}] ${a.component}: ${a.title} -> ${a.recommendation || "sin recomendación"}`)
+      ].join("\n");
+      await navigator.clipboard.writeText(text);
+      alert("Resumen copiado.");
+    }
+
+    document.getElementById("reloadBtn").addEventListener("click", loadJson);
+    document.getElementById("exportBtn").addEventListener("click", downloadJson);
+    document.getElementById("copyBtn").addEventListener("click", copySummary);
+    document.getElementById("addManualBtn").addEventListener("click", addManualAnomaly);
+    document.getElementById("fileInput").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        render(JSON.parse(text));
+      } catch (err) {
+        alert("No se pudo leer el JSON: " + err.message);
+      }
+    });
+
+    renderFileModeHint();
+    if (location.protocol !== "file:") {
+      loadJson();
+      setInterval(loadJson, 5000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿{"name": "demo", "version": "1.0", "description": "Plugin demo para Kitian", "tools": [{"comando": "hola plugin", "respuesta": "Plugin demo activo. Kitian funcionando con sistema de plugins."}]}

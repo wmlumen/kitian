@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. X20 - Stark Industries Neural Command Core</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for ultimate sci-fi aesthetics -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #010408;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(2, 24, 44, 0.4) 0%, transparent 85%),
+                linear-gradient(rgba(1, 10, 20, 0) 50%, rgba(0, 0, 0, 0.5) 50%), 
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03), rgba(0, 100, 255, 0.01), rgba(0, 240, 255, 0.03));
+            background-size: 100% 100%, 100% 4px, 6px 100%;
+            overflow-x: hidden;
+        }
+        /* Borderless floating panels with cybernetic ambient glow and corner markers */
+        .hud-panel {
+            background: rgba(1, 12, 24, 0.45);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            position: relative;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.02), inset 0 0 15px rgba(0, 240, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .hud-panel:hover {
+            border-color: rgba(0, 240, 255, 0.25);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.05), inset 0 0 20px rgba(0, 240, 255, 0.08);
+        }
+        /* Cyber-tech corner brackets */
+        .hud-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; width: 8px; height: 8px;
+            border-top: 2px solid #00f0ff;
+            border-left: 2px solid #00f0ff;
+        }
+        .hud-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px; width: 8px; height: 8px;
+            border-bottom: 2px solid #00f0ff;
+            border-right: 2px solid #00f0ff;
+        }
+        .orbitron-title {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+        /* Custom scrollbar for tactical console log window */
+        .custom-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.2);
+            border-radius: 1px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+<body class="text-cyan-100 min-h-screen flex flex-col justify-between p-3 selection:bg-cyan-500/30 selection:text-cyan-300">
+
+    <!-- TOP HEADER (JARVIS X20 SYSTEM BRAND) -->
+    <header class="flex flex-col lg:flex-row justify-between items-center border-b border-cyan-900/30 pb-2 mb-3 gap-3">
+        <div class="flex items-center gap-3">
+            <span class="text-[9px] text-[#00f0ff] font-bold border border-[#00f0ff]/30 px-1.5 py-0.5 animate-pulse bg-cyan-950/20">SYSTEM SECURE 99.99%</span>
+            <span class="text-[9px] text-cyan-500 font-bold">UPTIME: 127D 14H 22M</span>
+        </div>
+        
+        <div class="text-center">
+            <h1 class="orbitron-title text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00f0ff] to-[#0088ff] drop-shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+                JARVIS X20
+            </h1>
+            <p class="text-[9px] text-cyan-500 tracking-widest uppercase font-bold">NEURAL COMMAND CORE // INTERFAZ TÁCTICA EXPANDIDA</p>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs">
+            <div class="text-right">
+                <span class="text-[9px] text-cyan-600 block">AI MODEL: X20.7.9</span>
+                <span class="text-[9px] text-[#00ff88] font-bold">QUANTUM LINK // ACTIVE</span>
+            </div>
+            <i data-lucide="wifi" class="w-4 h-4 text-[#00ff88] animate-pulse"></i>
+        </div>
+    </header>
+
+    <!-- GRID DE PANELES ESTILO HOLOGRÁFICO -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch flex-grow">
+        
+        <!-- COLUMNA IZQUIERDA (DIAGNÓSTICO, RED NEURONAL, AMBIENTE) -->
+        <div class="lg:col-span-3 flex flex-col justify-between gap-3">
+            
+            <!-- Core Systems Panel -->
+            <div class="hud-panel p-3 rounded-none flex flex-col justify-between h-[155px]">
+                <div>
+                    <div class="flex justify-between items-center mb-1.5 border-b border-cyan-950/40 pb-1">
+                        <span class="text-[10px] font-black text-cyan-400 tracking-wider uppercase">CORE SYSTEMS</span>
+                        <i data-lucide="cpu" class="w-3.5 h-3.5 text-[#00f0ff]"></i>
+                    </div>
+                    <div class="space-y-1 text-[10px]">
+                        <div class="flex justify-between items-center">
+                            <span class="text-cyan-600">NEURAL ENGINE</span>
+                            <span class="font-bold text-[#00ff88]">100%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-cyan-600">PROCESSOR ARRAY</span>
+                            <span class="font-bold text-[#00ff88]">100%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-cyan-600">MEMORY BANKS</span>
+                            <span class="font-bold text-amber-400">98%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-cyan-600">QUANTUM CORES</span>
+                            <span class="font-bold text-[#00ff88]">100%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-cyan-600">SECURITY MATRIX</span>
+                            <span class="font-bold text-[#00ff88]">100%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[8px] text-cyan-700">
+                    <span>STARK SECURITY ACCESS</span>
+                    <span class="text-cyan-400 font-bold">LEVEL-5</span>
+                </div>
+            </div>
+
+            <!-- Neural Network Activity (3D Nodes Brain simulation) -->
+            <div class="hud-panel p-3 rounded-none flex flex-col justify-between h-[180px]">
+                <div>
+                    <div class="flex justify-between items-center mb-1 border-b border-cyan-950/40 pb-1">
+                        <span class="text-[10px] font-black text-cyan-400 tracking-wider">NEURAL NETWORK ACTIVITY</span>
+                        <span id="synaptic-rate" class="text-[9px] text-emerald-400 font-bold">92.7% ACT</span>
+                    </div>
+                    <!-- Sinapsis Neuronal Canvas -->
+                    <div class="h-28 w-full relative flex items-center justify-center">
+                        <canvas id="synapse-canvas" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[8px] text-cyan-700">
+                    <span>COGNITIVE BRAIN RECOGNITION</span>
+                    <span class="text-[#00f0ff] font-bold">LEARNING RATE: 0.0043</span>
+                </div>
+            </div>
+
+            <!-- Environment Analysis (Globe 3D model) -->
+            <div class="hud-panel p-3 rounded-none flex flex-col justify-between h-[190px]">
+                <div>
+                    <div class="flex justify-between items-center mb-1 border-b border-cyan-950/40 pb-1">
+                        <span class="text-[10px] font-black text-cyan-400 tracking-wider">ENVIRONMENT ANALYSIS</span>
+                        <i data-lucide="globe" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 h-28 items-center">
+                        <!-- Globe 3D wireframe canvas -->
+                        <div class="h-full w-full">
+                            <canvas id="globe-canvas" class="w-full h-full"></canvas>
+                        </div>
+                        <div class="text-[9px] space-y-1 text-cyan-500">
+                            <div>ATMOSPHERE: <span class="text-[#00ff88] font-bold">STABLE</span></div>
+                            <div>TEMPERATURE: <span class="text-cyan-300 font-bold">22.7°C</span></div>
+                            <div>HUMIDITY: <span class="text-cyan-300 font-bold">41%</span></div>
+                            <div>PRESSURE: <span class="text-[#00f0ff] font-bold">101.3 kPa</span></div>
+                            <div>WIND SPEED: <span class="text-[#00f0ff] font-bold">5.7 m/s</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[8px] text-cyan-700">
+                    <span>GLOBAL WATCH SECURITY</span>
+                    <span class="text-emerald-400 font-bold">NO THREATS DETECTED</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA CENTRAL (REACTOR ARC X20, CONTROLES DE ESTADO Y SUBTÍTULOS) -->
+        <div class="lg:col-span-6 flex flex-col justify-between gap-3">
+            
+            <!-- El Reactor Arc Central X20 -->
+            <div class="hud-panel flex-grow rounded-none relative flex flex-col items-center justify-center p-3 min-h-[360px] bg-cyan-950/5">
+                
+                <!-- Medidores circulares de Carga superior derecha e izquierda -->
+                <div class="absolute top-4 left-4 text-left">
+                    <span class="text-[8px] text-cyan-600 block tracking-widest uppercase">CPU LOAD</span>
+                    <span id="cpu-load-text" class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-mono">23%</span>
+                </div>
+                
+                <div class="absolute top-4 right-4 text-right">
+                    <span class="text-[8px] text-cyan-600 block tracking-widest uppercase">MEMORY</span>
+                    <span id="ram-load-text" class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-mono">78%</span>
+                </div>
+
+                <!-- Multiplicador Stark -->
+                <div class="absolute top-4 flex flex-col items-center">
+                    <span class="text-[9px] text-[#00f0ff] font-bold px-1.5 py-0.5 border border-[#00f0ff]/20">20X</span>
+                    <span class="text-[7px] text-cyan-600 uppercase mt-0.5 tracking-widest">PERFORMANCE MULTIPLIER</span>
+                </div>
+
+                <!-- Reactor Arc Master Canvas -->
+                <div class="w-full h-72 relative flex items-center justify-center">
+                    <canvas id="arc-reactor-canvas" class="w-full h-full max-h-[290px] cursor-grab active:cursor-grabbing"></canvas>
+                </div>
+
+                <!-- Command Priority Nominal indicator below central core -->
+                <div class="absolute bottom-4 flex flex-col items-center gap-0.5">
+                    <span class="text-[8px] text-cyan-600 tracking-wider uppercase font-bold">COMMAND PRIORITY</span>
+                    <span class="text-xs font-black text-emerald-400 tracking-widest uppercase drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">OPTIMAL</span>
+                    <span class="text-[7px] text-cyan-500 tracking-widest uppercase">◀◀ ALL SYSTEMS NOMINAL ▶▶</span>
+                </div>
+            </div>
+
+            <!-- Central Subtitles Area (J.A.R.V.I.S. Audio Feedback) -->
+            <div class="w-full px-4 py-2 text-center transition-all duration-300">
+                <div id="subtitles-display" class="font-bold text-cyan-400 text-xs md:text-sm tracking-widest drop-shadow-[0_0_10px_rgba(0,240,255,0.6)] leading-relaxed">
+                    J.A.R.V.I.S.: "Todo en orden, Señor. Los subsistemas de la armadura están estables."
+                </div>
+            </div>
+
+            <!-- Interfaz de Control de Estados (Holograma Standby / Acciones) -->
+            <div class="flex flex-wrap gap-1 items-center justify-center bg-cyan-950/10 p-1.5 border border-cyan-900/10">
+                <span class="text-[8px] text-cyan-600 font-bold mr-2 uppercase tracking-widest">CORE STATE DISPATCHER:</span>
+                <button onclick="changeState('Activo')" id="btn-Activo" class="state-btn text-[9px] px-2 py-0.5 text-[#00f0ff] hover:bg-cyan-500/10 transition-all font-bold tracking-widest">STANDBY</button>
+                <button onclick="changeState('Escuchando')" id="btn-Escuchando" class="state-btn text-[9px] px-2 py-0.5 text-cyan-400 hover:bg-cyan-400/10 transition-all font-bold tracking-widest">ESCUCHANDO</button>
+                <button onclick="changeState('Pensando')" id="btn-Pensando" class="state-btn text-[9px] px-2 py-0.5 text-purple-400 hover:bg-purple-400/10 transition-all font-bold tracking-widest">PROCESANDO</button>
+                <button onclick="changeState('Hablando')" id="btn-Hablando" class="state-btn text-[9px] px-2 py-0.5 text-amber-400 hover:bg-amber-400/10 transition-all font-bold tracking-widest">HABLANDO</button>
+                <button onclick="changeState('Error')" id="btn-Error" class="state-btn text-[9px] px-2 py-0.5 text-red-500 hover:bg-red-500/10 transition-all font-bold tracking-widest">ANOMALÍA</button>
+                <button onclick="changeState('Offline')" id="btn-Offline" class="state-btn text-[9px] px-2 py-0.5 text-gray-500 hover:bg-gray-500/10 transition-all font-bold tracking-widest">DESACTIVADO</button>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA (ANALÍTICA, THREAT, DIAGNÓSTICOS, INTERFAZ) -->
+        <div class="lg:col-span-3 flex flex-col justify-between gap-3">
+            
+            <!-- Predictive Analytics / Threat Detection -->
+            <div class="hud-panel p-3 rounded-none flex flex-col justify-between h-[155px]">
+                <div>
+                    <div class="flex justify-between items-center mb-1 border-b border-cyan-950/40 pb-1">
+                        <span class="text-[10px] font-black text-cyan-400 tracking-wider">PREDICTIVE ANALYTICS</span>
+                        <span class="text-[9px] text-[#00f0ff] font-bold">99.81% ACC</span>
+                    </div>
+                    <div class="h-20 w-full">
+                        <canvas id="predictive-canvas" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[8px] text-cyan-700">
+                    <span>NEXT THREAT VECTOR</span>
+                    <span class="text-amber-400 font-bold font-mono">CONFIDENCE: 98.7%</span>
+                </div>
+            </div>
+
+            <!-- Threat Detection (Radar circular sweeps) -->
+            <div class="hud-panel p-3 rounded-none flex flex-col justify-between h-[180px]">
+                <div>
+                    <div class="flex justify-between items-center mb-1 border-b border-cyan-950/40 pb-1">
+                        <span class="text-[10px] font-black text-cyan-400 tracking-wider">THREAT DETECTION</span>
+                        <span class="text-[9px] text-red-500 font-bold">LEVEL: MINIMAL</span>
+                    </div>
+                    <!-- Radar Canvas -->
+                    <div class="h-28 w-full flex items-center justify-center">
+                        <canvas id="radar-canvas" class="w-full h-full max-h-[105px]"></canvas>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[8px] text-cyan-700">
+                    <span>SECTOR INTEGRITY TARGETS</span>
+                    <span class="text-cyan-400 font-bold">0 ACTIVE THREATS</span>
+                </div>
+            </div>
+
+            <!-- System Diagnostics (Interactive Rotating 3D Starship wireframe) -->
+            <div class="hud-panel p-3 rounded-none flex flex-col justify-between h-[190px]">
+                <div>
+                    <div class="flex justify-between items-center mb-1 border-b border-cyan-950/40 pb-1">
+                        <span class="text-[10px] font-black text-cyan-400 tracking-wider">SYSTEM DIAGNOSTICS</span>
+                        <i data-lucide="shield" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 h-28 items-center">
+                        <!-- Spaceship Canvas -->
+                        <div class="h-full w-full">
+                            <canvas id="starship-canvas" class="w-full h-full"></canvas>
+                        </div>
+                        <div class="text-[8px] space-y-1 text-cyan-500 leading-tight">
+                            <div>THRUSTERS: <span class="text-[#00ff88] font-bold">NOMINAL</span></div>
+                            <div>REPLICATORS: <span class="text-[#00ff88] font-bold">ACTIVE</span></div>
+                            <div>NAV MATRIX: <span class="text-[#00ff88] font-bold">NOMINAL</span></div>
+                            <div>WEAPONS: <span class="text-amber-400 font-bold">STANDBY</span></div>
+                            <div>SHIELDS: <span class="text-[#00ff88] font-bold">99.8%</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center text-[8px] text-cyan-700">
+                    <span>HARDWARE STRUCTURE DIAG</span>
+                    <span class="text-[#00f0ff] font-bold">INTEGRITY SECURE</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- CONSOLA TÁCTICA EXPANDIDA + AJUSTES HOLOGRÁFICOS (DOCK INFERIOR) -->
+    <section class="hud-panel p-3 rounded-none w-full mt-3 flex flex-col lg:flex-row gap-3 justify-between items-stretch">
+        
+        <!-- Terminal Logs -->
+        <div class="flex-grow flex flex-col justify-between min-h-[85px] lg:w-2/3">
+            <div class="flex justify-between items-center mb-1 border-b border-cyan-950/30 pb-0.5">
+                <span class="text-[10px] font-bold text-cyan-500 tracking-widest uppercase">CONSOLA DE COMANDOS DE J.A.R.V.I.S.</span>
+                <span class="text-[8px] text-cyan-600">STARK INDUSTRIES HYPERTERMINAL 4.0</span>
+            </div>
+            <!-- Log output buffer -->
+            <div id="terminal-logs" class="flex-grow my-1 overflow-y-auto text-[10px] space-y-0.5 custom-scroll text-cyan-400/90 h-14 pr-1">
+                <div>[SISTEMA]: Inicializando núcleo cuántico J.A.R.V.I.S. X20...</div>
+                <div>[SISTEMA]: Enlace de telemetría de armadura Mark LXXXV establecido en canal Q-256.</div>
+                <div>[INFO]: Doble click en el Reactor Arc Central para purga de EMP magnética.</div>
+            </div>
+        </div>
+
+        <!-- Command input and parameters sliders -->
+        <div class="flex flex-col md:flex-row justify-between lg:w-1/3 gap-3">
+            
+            <!-- Parameters sliders -->
+            <div class="flex-grow flex flex-col justify-between text-[9px] gap-1.5 md:w-1/2">
+                <div>
+                    <div class="flex justify-between text-cyan-600 mb-0.5 font-bold">
+                        <span>VELOCIDAD OSCILACIÓN CORE</span>
+                        <span id="speed-val">1.0x</span>
+                    </div>
+                    <input id="slider-speed" type="range" min="0.1" max="2.5" step="0.1" value="1" 
+                           class="w-full accent-cyan-400 bg-cyan-950/40 h-1 cursor-pointer">
+                </div>
+                <div>
+                    <div class="flex justify-between text-cyan-600 mb-0.5 font-bold">
+                        <span>DENSIDAD DE FOTONES</span>
+                        <span id="density-val">120</span>
+                    </div>
+                    <input id="slider-density" type="range" min="20" max="250" step="5" value="120" 
+                           class="w-full accent-cyan-400 bg-cyan-950/40 h-1 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Terminal Inputs -->
+            <div class="flex flex-col justify-between md:w-1/2 gap-1.5">
+                <div class="text-[8px] text-cyan-600 font-bold uppercase tracking-widest">ENTRADA MANUAL DE VOZ/DATOS</div>
+                <div class="flex gap-1.5 bg-cyan-950/20 p-1 rounded-none border border-cyan-950">
+                    <span class="text-cyan-400 text-xs font-bold self-center animate-pulse px-0.5">&gt;</span>
+                    <input type="text" id="console-input" 
+                           class="flex-grow bg-transparent text-cyan-300 font-mono text-[10px] p-1 focus:outline-none placeholder-cyan-800"
+                           placeholder="Ingresar comando o palabra clave..." 
+                           onkeydown="handleConsoleInput(event)">
+                    <button onclick="submitConsoleCommand()" class="bg-[#00f0ff]/10 hover:bg-[#00f0ff]/20 text-[#00f0ff] text-[9px] px-2 py-0.5 font-bold tracking-wider rounded transition-colors border border-[#00f0ff]/20">EJECUTAR</button>
+                </div>
+                <div class="flex justify-between items-center text-[8px]">
+                    <span class="text-cyan-600">AUDIO ENGINE</span>
+                    <button onclick="toggleAudioMute()" id="mute-btn" class="text-[#00f0ff] hover:underline uppercase font-bold">MUTEAR EFECTOS</button>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER BAR (DIAGNÓSTICO FINAL) -->
+    <footer class="flex flex-col sm:flex-row justify-between items-center pt-2 mt-2 text-[8px] text-cyan-700 font-bold uppercase tracking-wider gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+            <span>JARVIS SYSTEM INTEGRATION MODULE</span>
+            <span>|</span>
+            <span class="text-cyan-500">FPS: <span id="footer-fps" class="font-mono">60</span></span>
+            <span>|</span>
+            <span class="text-cyan-500">ESTABILIDAD NÚCLEO: <span id="footer-stab" class="text-emerald-400 font-mono">99.4%</span></span>
+            <span>|</span>
+            <span class="text-cyan-500">TIEMPO OPERACIÓN: <span id="footer-uptime" class="font-mono">0s</span></span>
+            <span>|</span>
+            <span id="footer-state-badge" class="px-1.5 py-0.5 text-black bg-[#00f0ff] font-bold">STANDBY</span>
+        </div>
+        <div class="text-[#00ff88] flex items-center gap-1 animate-pulse drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">
+            <i data-lucide="lock" class="w-3 h-3"></i>
+            <span>SISTEMA ENLACE CUÁNTICO ACTIVADO · PROPIEDAD DE STARK INDUSTRIES</span>
+        </div>
+    </footer>
+
+    <!-- JS ENGINE LOGIC -->
+    <script>
+        // Configuración de colores de estados alineados al estilo X20
+        const COLORS = {
+            "Activo":      ["#00e5ff", "#00ff88"], // Standby Cyan-Green
+            "Escuchando":  ["#00f0ff", "#0088ff"], // Bright Blue
+            "Pensando":    ["#cc44ff", "#ff88cc"], // Cyber Purple
+            "Hablando":    ["#ffd000", "#ffaa00"], // Stark Gold
+            "Offline":     ["#555555", "#333333"], // Offline Gray
+            "Error":       ["#ff2a00", "#990000"], // Alarm Red
+            "Apagado":     ["#222222", "#111111"],
+        };
+
+        const FUNC_WORDS = ["ANALYZE", "ADAPT", "LEARN", "DECIDE", "EXECUTE"];
+
+        // Variables de la máquina de estados
+        let currentState = "Activo";
+        let targetColor = COLORS[currentState][0];
+        let animationSpeed = 1.0;
+        let particleDensity = 120;
+        let frameCount = 0;
+        let stabilityIndex = 99.4;
+        let appStartTime = Date.now();
+        let lastFrameTime = performance.now();
+        let fps = 60;
+        let sfxEnabled = true;
+
+        // Partículas de energía Stark
+        let particles = [];
+        let amplitude = 0.03;
+
+        // Búferes de gráficos
+        let predictiveHistory = Array(45).fill(70);
+
+        // Referencias de lienzo (Canvas)
+        const arcReactorCanvas = document.getElementById('arc-reactor-canvas');
+        const rCtx = arcReactorCanvas.getContext('2d');
+        const predictiveCanvas = document.getElementById('predictive-canvas');
+        const pCtx = predictiveCanvas.getContext('2d');
+        const synapseCanvas = document.getElementById('synapse-canvas');
+        const sCtx = synapseCanvas.getContext('2d');
+        const globeCanvas = document.getElementById('globe-canvas');
+        const gCtx = globeCanvas.getContext('2d');
+        const starshipCanvas = document.getElementById('starship-canvas');
+        const ssCtx = starshipCanvas.getContext('2d');
+        const radarCanvas = document.getElementById('radar-canvas');
+        const radCtx = radarCanvas.getContext('2d');
+
+        // Inicializador del sistema de audio de J.A.R.V.I.S. (Web Audio API)
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Sintetizador para efectos de sonido futuristas
+        function playSound(type) {
+            if (!sfxEnabled) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                switch (type) {
+                    case 'click':
+                        let osc1 = audioCtx.createOscillator();
+                        let gain1 = audioCtx.createGain();
+                        osc1.type = 'sine';
+                        osc1.frequency.setValueAtTime(1500, audioCtx.currentTime);
+                        osc1.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
+                        gain1.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                        gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                        osc1.connect(gain1);
+                        gain1.connect(audioCtx.destination);
+                        osc1.start();
+                        osc1.stop(audioCtx.currentTime + 0.05);
+                        break;
+                    case 'alert':
+                        let now = audioCtx.currentTime;
+                        [2000, 2500].forEach((freq, idx) => {
+                            let osc = audioCtx.createOscillator();
+                            let gain = audioCtx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+                            gain.gain.setValueAtTime(0.06, now + idx * 0.06);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.05);
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            osc.start(now + idx * 0.06);
+                            osc.stop(now + idx * 0.06 + 0.05);
+                        });
+                        break;
+                    case 'thinking':
+                        let osc3 = audioCtx.createOscillator();
+                        let gain3 = audioCtx.createGain();
+                        osc3.type = 'sine';
+                        osc3.frequency.setValueAtTime(300, audioCtx.currentTime);
+                        osc3.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.3);
+                        
+                        let filter = audioCtx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(700, audioCtx.currentTime);
+
+                        gain3.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                        gain3.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+                        osc3.connect(filter);
+                        filter.connect(gain3);
+                        gain3.connect(audioCtx.destination);
+                        osc3.start();
+                        osc3.stop(audioCtx.currentTime + 0.35);
+                        break;
+                    case 'error':
+                        let oscE = audioCtx.createOscillator();
+                        let gainE = audioCtx.createGain();
+                        oscE.type = 'sawtooth';
+                        oscE.frequency.setValueAtTime(350, audioCtx.currentTime);
+                        oscE.frequency.setValueAtTime(240, audioCtx.currentTime + 0.12);
+                        gainE.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                        gainE.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                        oscE.connect(gainE);
+                        gainE.connect(audioCtx.destination);
+                        oscE.start();
+                        oscE.stop(audioCtx.currentTime + 0.25);
+                        break;
+                }
+            } catch (e) {
+                console.log("Audio awaiting user interaction:", e);
+            }
+        }
+
+        function toggleAudioMute() {
+            sfxEnabled = !sfxEnabled;
+            const btn = document.getElementById('mute-btn');
+            if (sfxEnabled) {
+                btn.innerText = "MUTEAR EFECTOS";
+                playSound('click');
+            } else {
+                btn.innerText = "ACTIVAR AUDIO";
+            }
+        }
+
+        // Configuración dinámica de lienzos tácticos
+        function resizeCanvases() {
+            // Reactor Arc Canvas
+            const rect = arcReactorCanvas.parentElement.getBoundingClientRect();
+            arcReactorCanvas.width = rect.width * window.devicePixelRatio;
+            arcReactorCanvas.height = rect.height * window.devicePixelRatio;
+            rCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            // Predictive line graph
+            predictiveCanvas.width = predictiveCanvas.parentElement.clientWidth;
+            predictiveCanvas.height = predictiveCanvas.parentElement.clientHeight;
+
+            // Synaptic brain graph
+            synapseCanvas.width = synapseCanvas.parentElement.clientWidth;
+            synapseCanvas.height = synapseCanvas.parentElement.clientHeight;
+
+            // Globe and starship
+            globeCanvas.width = globeCanvas.parentElement.clientWidth;
+            globeCanvas.height = globeCanvas.parentElement.clientHeight;
+            starshipCanvas.width = starshipCanvas.parentElement.clientWidth;
+            starshipCanvas.height = starshipCanvas.parentElement.clientHeight;
+
+            // Threat radar
+            radarCanvas.width = radarCanvas.parentElement.clientWidth;
+            radarCanvas.height = radarCanvas.parentElement.clientHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+
+        // Convertidor Hexadecimal a degradados cian translúcidos de Stark
+        function getShades(hexColor) {
+            let r = parseInt(hexColor.slice(1,3), 16);
+            let g = parseInt(hexColor.slice(3,5), 16);
+            let b = parseInt(hexColor.slice(5,7), 16);
+            
+            return [
+                `rgb(${r}, ${g}, ${b})`,
+                `rgb(${Math.min(255, Math.floor(r*0.65))}, ${Math.min(255, Math.floor(g*0.65))}, ${Math.min(255, Math.floor(b*0.65))})`,
+                `rgb(${Math.min(255, Math.floor(r*0.40))}, ${Math.min(255, Math.floor(g*0.40))}, ${Math.min(255, Math.floor(b*0.40))})`,
+                `rgb(${Math.min(255, Math.floor(r*0.20))}, ${Math.min(255, Math.floor(g*0.20))}, ${Math.min(255, Math.floor(b*0.20))})`,
+                `rgb(${Math.min(255, Math.floor(r*0.10))}, ${Math.min(255, Math.floor(g*0.10))}, ${Math.min(255, Math.floor(b*0.10))})`,
+                `rgb(${Math.min(255, Math.floor(r*0.04))}, ${Math.min(255, Math.floor(g*0.04))}, ${Math.min(255, Math.floor(b*0.04))})`
+            ];
+        }
+
+        // Cambio de estado global de J.A.R.V.I.S.
+        function changeState(newState) {
+            if (!COLORS[newState]) return;
+            currentState = newState;
+            targetColor = COLORS[newState][0];
+            
+            if (newState === 'Error') playSound('error');
+            else if (newState === 'Pensando') playSound('thinking');
+            else playSound('click');
+
+            appendLog(`[SISTEMA]: Estado de J.A.R.V.I.S. modificado a -> ${newState.toUpperCase()}`);
+
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                const stateType = btn.id.split('-')[1];
+                if (stateType === newState) {
+                    btn.classList.add('bg-cyan-500/10', 'text-cyan-400');
+                } else {
+                    btn.classList.remove('bg-cyan-500/10', 'text-cyan-400');
+                }
+            });
+
+            const badge = document.getElementById('footer-state-badge');
+            
+            if (newState === 'Activo') { 
+                badge.innerText = "STANDBY";
+                badge.className = "px-1.5 py-0.5 text-black bg-[#00f0ff] rounded font-bold"; 
+            }
+            else if (newState === 'Escuchando') { 
+                badge.innerText = "ESCUCHANDO";
+                badge.className = "px-1.5 py-0.5 text-black bg-cyan-400 rounded font-bold"; 
+            }
+            else if (newState === 'Pensando') { 
+                badge.innerText = "PROCESANDO";
+                badge.className = "px-1.5 py-0.5 text-white bg-purple-600 rounded font-bold"; 
+            }
+            else if (newState === 'Hablando') { 
+                badge.innerText = "HABLANDO";
+                badge.className = "px-1.5 py-0.5 text-black bg-amber-400 rounded font-bold"; 
+            }
+            else if (newState === 'Offline') { 
+                badge.innerText = "APAGADO";
+                badge.className = "px-1.5 py-0.5 text-white bg-zinc-600 rounded font-bold"; 
+            }
+            else if (newState === 'Error') { 
+                badge.innerText = "ANOMALÍA";
+                badge.className = "px-1.5 py-0.5 text-white bg-red-600 rounded font-bold"; 
+            }
+
+            const subtitle = document.getElementById('subtitles-display');
+            if (newState === 'Activo') subtitle.innerText = "J.A.R.V.I.S.: \"Todo en orden, Señor. Los subsistemas de la armadura están estables.\"";
+            else if (newState === 'Escuchando') subtitle.innerText = "J.A.R.V.I.S.: \"Adelante, Señor. Capturando comandos de telemetría por modulador de voz...\"";
+            else if (newState === 'Pensando') subtitle.innerText = "J.A.R.V.I.S.: \"Procesando trayectorias óptimas de vuelo y comprobando los propulsores...\"";
+            else if (newState === 'Hablando') subtitle.innerText = "J.A.R.V.I.S.: \"He desplegado los alerones de vuelo traseros y calibrado los sistemas de puntería.\"";
+            else if (newState === 'Offline') subtitle.innerText = "J.A.R.V.I.S.: \"Núcleo temporalmente apagado. Sistemas de emergencia en modo pasivo.\"";
+            else if (newState === 'Error') subtitle.innerText = "J.A.R.V.I.S.: \"¡Señor! Se ha detectado una sobrecarga de energía en el reactor central de paladio.\"";
+        }
+
+        function appendLog(text) {
+            const container = document.getElementById('terminal-logs');
+            const entry = document.createElement('div');
+            const timeStr = new Date().toTimeString().split(' ')[0];
+            entry.innerHTML = `<span class="text-cyan-800">[${timeStr}]</span> ${text}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleConsoleInput(e) {
+            if (e.key === 'Enter') {
+                submitConsoleCommand();
+            }
+        }
+
+        function submitConsoleCommand() {
+            const input = document.getElementById('console-input');
+            const rawVal = input.value.trim();
+            if (!rawVal) return;
+            
+            appendLog(`<span class="text-cyan-300">&gt; ${rawVal}</span>`);
+            input.value = "";
+            playSound('click');
+
+            const val = rawVal.toUpperCase();
+
+            if (val === 'HELP' || val === '/HELP') {
+                appendLog("[ASISTENTE]: Comandos disponibles: VERONICA, SISTEMA, COMPILAR, ANALIZAR, LIMPIAR, INICIAR [ACTIVO/ESCUCHANDO/PENSANDO/HABLANDO/OFFLINE/ERROR]");
+            } else if (val === 'LIMPIAR' || val === '/CLEAR' || val === 'CLEAR') {
+                document.getElementById('terminal-logs').innerHTML = "";
+                appendLog("[SISTEMA]: Se ha liberado la memoria intermedia de logs.");
+            } else if (val === 'SISTEMA' || val === 'SYS') {
+                appendLog("[DIAGNÓSTICO]: Estado de Verónica: Listo. Escudos térmicos al 100%. Protocolo de combate stand-by.");
+            } else if (val === 'VERONICA' || val === 'VERÓNICA') {
+                changeState('Pensando');
+                appendLog("[ÓRDEN]: Solicitando despliegue de armadura pesada Verónica desde órbita...");
+                setTimeout(() => {
+                    changeState('Hablando');
+                    document.getElementById('subtitles-display').innerText = "J.A.R.V.I.S.: \"Verónica se encuentra en posición orbital de reingreso, Señor.\"";
+                    setTimeout(() => changeState('Activo'), 3000);
+                }, 2000);
+            } else if (val === 'ANALIZAR' || val === 'ANALYZE') {
+                changeState('Pensando');
+                setTimeout(() => {
+                    changeState('Activo');
+                    appendLog("[RESULTADOS]: Calibración del Reactor X20 finalizada. Pureza del Paladio óptima.");
+                }, 2500);
+            } else if (val === 'COMPILAR' || val === 'OPTIMIZE') {
+                changeState('Pensando');
+                setTimeout(() => {
+                    changeState('Hablando');
+                    appendLog("[SISTEMA]: Limpieza de memoria temporal completa.");
+                    setTimeout(() => changeState('Activo'), 2000);
+                }, 3000);
+            } else if (val.startsWith('INICIAR ')) {
+                const parts = val.split(' ');
+                const reqState = parts[1].charAt(0) + parts[1].slice(1).toLowerCase();
+                if (COLORS[reqState]) {
+                    changeState(reqState);
+                } else {
+                    appendLog(`[ERROR]: Parámetro de estado no válido.`);
+                }
+            } else {
+                appendLog(`[J.A.R.V.I.S.]: Procesando palabra clave en servidores Stark...`);
+                changeState('Pensando');
+                setTimeout(() => {
+                    changeState('Hablando');
+                    document.getElementById('subtitles-display').innerText = `J.A.R.V.I.S.: "He ejecutado el subproceso táctico para '${rawVal.toUpperCase()}'. Sin complicaciones, Señor."`;
+                    setTimeout(() => changeState('Activo'), 2500);
+                }, 1800);
+            }
+        }
+
+        // Generador de telemetría dinámica
+        function updateMetrics() {
+            let baseCpu = 23;
+            if (currentState === 'Pensando') baseCpu = 85;
+            else if (currentState === 'Hablando') baseCpu = 44;
+            else if (currentState === 'Escuchando') baseCpu = 32;
+            else if (currentState === 'Offline') baseCpu = 2;
+
+            const currentCpu = Math.min(100, Math.floor(baseCpu + Math.sin(Date.now()*0.005) * 5 + Math.random() * 4));
+            const currentRam = Math.min(100, Math.floor(78 + Math.sin(Date.now()*0.001) * 1));
+            
+            document.getElementById('cpu-load-text').innerText = `${currentCpu}%`;
+            document.getElementById('ram-load-text').innerText = `${currentRam}%`;
+
+            stabilityIndex = 99.4 + 0.6 * Math.sin(frameCount * 0.01);
+            document.getElementById('footer-stab').innerText = `${stabilityIndex.toFixed(1)}%`;
+            document.getElementById('synaptic-rate').innerText = `${(90 + 5 * Math.sin(frameCount * 0.03)).toFixed(1)}% ACT`;
+
+            document.getElementById('footer-uptime').innerText = `${Math.floor((Date.now() - appStartTime) / 1000)}s`;
+        }
+
+        // --- RENDERIZADORES DE GRÁFICOS HOLOGRÁFICOS ---
+
+        // 1. Gráfico de Analítica Predictiva
+        function drawPredictiveGraph() {
+            pCtx.clearRect(0, 0, predictiveCanvas.width, predictiveCanvas.height);
+            pCtx.strokeStyle = "rgba(0, 240, 255, 0.6)";
+            pCtx.lineWidth = 1.2;
+            pCtx.beginPath();
+            const stepP = predictiveCanvas.width / (predictiveHistory.length - 1);
+            for(let i = 0; i < predictiveHistory.length; i++) {
+                const x = i * stepP;
+                if (frameCount % 8 === 0) {
+                    predictiveHistory[i] = 40 + Math.sin(frameCount * 0.02 + i * 0.5) * 15 + Math.random() * 5;
+                }
+                const y = predictiveCanvas.height - (predictiveHistory[i] / 100 * (predictiveCanvas.height - 20)) - 10;
+                if (i === 0) pCtx.moveTo(x, y);
+                else pCtx.lineTo(x, y);
+            }
+            pCtx.stroke();
+        }
+
+        // 2. Sinapsis de Red Neuronal (3D Brain Simulation)
+        let synapseNodes = [];
+        function initSynapses() {
+            synapseNodes = [];
+            const count = 24;
+            for(let i=0; i<count; i++) {
+                synapseNodes.push({
+                    x: Math.random() * 200 + 20,
+                    y: Math.random() * 80 + 15,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    r: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function drawSynapses() {
+            sCtx.clearRect(0, 0, synapseCanvas.width, synapseCanvas.height);
+            sCtx.fillStyle = "rgba(0, 240, 255, 0.7)";
+            sCtx.strokeStyle = "rgba(0, 240, 255, 0.15)";
+            sCtx.lineWidth = 0.5;
+
+            // Update & Draw nodes
+            synapseNodes.forEach((node, idx) => {
+                node.x += node.vx;
+                node.y += node.vy;
+
+                // Bounce
+                if(node.x < 0 || node.x > synapseCanvas.width) node.vx *= -1;
+                if(node.y < 0 || node.y > synapseCanvas.height) node.vy *= -1;
+
+                sCtx.beginPath();
+                sCtx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+                sCtx.fill();
+
+                // Draw connections
+                for(let j = idx + 1; j < synapseNodes.length; j++) {
+                    const other = synapseNodes[j];
+                    const dist = Math.hypot(node.x - other.x, node.y - other.y);
+                    if(dist < 45) {
+                        sCtx.beginPath();
+                        sCtx.moveTo(node.x, node.y);
+                        sCtx.lineTo(other.x, other.y);
+                        sCtx.stroke();
+                    }
+                }
+            });
+        }
+
+        // 3. Globo 3D Wireframe Rotatorio
+        let globeAngleY = 0;
+        function drawGlobe() {
+            gCtx.clearRect(0, 0, globeCanvas.width, globeCanvas.height);
+            const cx = globeCanvas.width / 2;
+            const cy = globeCanvas.height / 2;
+            const r = 40;
+
+            gCtx.strokeStyle = "rgba(0, 240, 255, 0.15)";
+            gCtx.lineWidth = 0.5;
+
+            globeAngleY += 0.007;
+
+            // Draw parallels (Latitudes)
+            for(let lat = -Math.PI/2; lat <= Math.PI/2; lat += Math.PI/6) {
+                const pr = r * Math.cos(lat);
+                const py = cy + r * Math.sin(lat);
+                
+                gCtx.beginPath();
+                gCtx.ellipse(cx, py, pr, pr * 0.25, 0, 0, Math.PI * 2);
+                gCtx.stroke();
+            }
+
+            // Draw meridians (Longitudes)
+            for(let lon = 0; lon < Math.PI * 2; lon += Math.PI/6) {
+                const effectiveLon = lon + globeAngleY;
+                const rx = r * Math.cos(effectiveLon);
+                
+                gCtx.strokeStyle = Math.sin(effectiveLon) > 0 ? "rgba(0, 240, 255, 0.25)" : "rgba(0, 240, 255, 0.08)";
+                gCtx.beginPath();
+                
+                // Draw longitude curves as ellipses
+                gCtx.ellipse(cx, cy, Math.abs(rx), r, 0, 0, Math.PI * 2);
+                gCtx.stroke();
+            }
+
+            // Outer glow ring
+            gCtx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+            gCtx.lineWidth = 1;
+            gCtx.beginPath();
+            gCtx.arc(cx, cy, r + 4, 0, Math.PI*2);
+            gCtx.stroke();
+        }
+
+        // 4. Caza Estelar 3D (Spaceship Wireframe Projection)
+        let ssAngleY = 0;
+        let ssAngleX = 0.2;
+        // Vertices 3D
+        const ssVertices = [
+            {x: 0, y: 0, z: 35},    // 0: Nose
+            {x: 12, y: 0, z: -15},  // 1: Right wing-join
+            {x: -12, y: 0, z: -15}, // 2: Left wing-join
+            {x: 0, y: 6, z: -15},   // 3: Tail-join top
+            {x: 0, y: -4, z: -15},  // 4: Engine body bottom
+            {x: 30, y: -2, z: -8},  // 5: Wing tip Right
+            {x: -30, y: -2, z: -8}, // 6: Wing tip Left
+            {x: 0, y: 15, z: -25}   // 7: Vertical stabilizer tip
+        ];
+        // Conexiones de aristas (Edges)
+        const ssEdges = [
+            [0, 1], [0, 2], [0, 3], [0, 4],
+            [1, 5], [5, 2], [2, 6], [6, 1],
+            [1, 3], [2, 3], [1, 4], [2, 4],
+            [3, 7], [7, 4], [7, 0]
+        ];
+
+        function drawStarship() {
+            ssCtx.clearRect(0, 0, starshipCanvas.width, starshipCanvas.height);
+            const cx = starshipCanvas.width / 2;
+            const cy = starshipCanvas.height / 2;
+            const scale = 1.3;
+
+            ssAngleY += 0.01;
+            ssAngleX = 0.2 + 0.1 * Math.sin(frameCount * 0.02);
+
+            // Project vertices
+            const projected = ssVertices.map(v => {
+                // Rotation Y
+                let x1 = v.x * Math.cos(ssAngleY) - v.z * Math.sin(ssAngleY);
+                let z1 = v.x * Math.sin(ssAngleY) + v.z * Math.cos(ssAngleY);
+                // Rotation X
+                let y2 = v.y * Math.cos(ssAngleX) - z1 * Math.sin(ssAngleX);
+                let z2 = v.y * Math.sin(ssAngleX) + z1 * Math.cos(ssAngleX);
+
+                // Ortographic projection
+                return {
+                    x: cx + x1 * scale,
+                    y: cy - y2 * scale
+                };
+            });
+
+            // Draw edges
+            ssCtx.strokeStyle = "rgba(0, 240, 255, 0.45)";
+            ssCtx.lineWidth = 0.8;
+            ssEdges.forEach(edge => {
+                const p1 = projected[edge[0]];
+                const p2 = projected[edge[1]];
+                ssCtx.beginPath();
+                ssCtx.moveTo(p1.x, p1.y);
+                ssCtx.lineTo(p2.x, p2.y);
+                ssCtx.stroke();
+            });
+
+            // Draw points
+            ssCtx.fillStyle = "#00ff88";
+            projected.forEach(p => {
+                ssCtx.beginPath();
+                ssCtx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+                ssCtx.fill();
+            });
+        }
+
+        // 5. Radar de amenazas circular
+        let radarSweepAngle = 0;
+        function drawRadar() {
+            radCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
+            const cx = radarCanvas.width / 2;
+            const cy = radarCanvas.height / 2;
+            const r = 45;
+
+            // Dibujar cuadrícula de círculos de alcance
+            radCtx.strokeStyle = "rgba(0, 240, 255, 0.1)";
+            radCtx.lineWidth = 0.5;
+            for(let i=1; i<=3; i++) {
+                radCtx.beginPath();
+                radCtx.arc(cx, cy, r * (i/3), 0, Math.PI * 2);
+                radCtx.stroke();
+            }
+
+            // Dibujar cruz del radar
+            radCtx.beginPath();
+            radCtx.moveTo(cx - r, cy); radCtx.lineTo(cx + r, cy);
+            radCtx.moveTo(cx, cy - r); radCtx.lineTo(cx, cy + r);
+            radCtx.stroke();
+
+            // Dibujar barrido de luz
+            radarSweepAngle += 0.02;
+            radCtx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+            radCtx.lineWidth = 1;
+            radCtx.beginPath();
+            radCtx.moveTo(cx, cy);
+            radCtx.lineTo(cx + r * Math.cos(radarSweepAngle), cy + r * Math.sin(radarSweepAngle));
+            radCtx.stroke();
+
+            // Dibujar objetivos simulados (Targets pulsing)
+            radCtx.fillStyle = "rgba(255, 42, 0, " + (0.3 + 0.7 * Math.abs(Math.sin(frameCount * 0.05))) + ")";
+            const targetPos = [
+                {x: cx + r * 0.5, y: cy - r * 0.3},
+                {x: cx - r * 0.6, y: cy + r * 0.4}
+            ];
+            targetPos.forEach(t => {
+                radCtx.beginPath();
+                radCtx.arc(t.x, t.y, 2, 0, Math.PI*2);
+                radCtx.fill();
+            });
+        }
+
+        // --- ARQUITECTURA DEL REACTOR ARC CENTRAL (CANVAS) ---
+        let arcRotationAngle = 0;
+        function drawArcReactor() {
+            const W = arcReactorCanvas.width / window.devicePixelRatio;
+            const H = arcReactorCanvas.height / window.devicePixelRatio;
+            const CX = W / 2;
+            const CY = H / 2;
+
+            rCtx.clearRect(0, 0, W, H);
+            arcRotationAngle += 0.02 * animationSpeed;
+
+            const shades = getShades(targetColor);
+            const activeColor = shades[0];
+            const R = 54 + 4 * Math.sin(frameCount * 0.04);
+
+            // Anillos concéntricos asimétricos segmentados
+            for (let i = 12; i > 0; i--) {
+                const gr = R + 5 + i * 11;
+                const shadeIdx = Math.min(i, 5);
+                rCtx.strokeStyle = shades[shadeIdx];
+                rCtx.lineWidth = i > 6 ? 0.4 : 0.8;
+                rCtx.beginPath();
+                
+                // Segments
+                if (i % 3 === 0) {
+                    rCtx.setLineDash([12, 18]);
+                } else if (i % 2 === 0) {
+                    rCtx.setLineDash([35, 12]);
+                } else {
+                    rCtx.setLineDash([]);
+                }
+                
+                rCtx.arc(CX, CY, gr, arcRotationAngle * (i * 0.015), Math.PI * 2 + arcRotationAngle * (i * 0.015));
+                rCtx.stroke();
+                rCtx.setLineDash([]);
+            }
+
+            // Reguladores magnéticos (Líneas radiales de telemetría)
+            rCtx.strokeStyle = shades[3];
+            rCtx.lineWidth = 0.5;
+            for (let j = 0; j < 48; j++) {
+                const a = (j * Math.PI / 24) + arcRotationAngle * 0.04;
+                const x1 = CX + (R + 42) * Math.cos(a);
+                const y1 = CY + (R + 42) * Math.sin(a);
+                const x2 = CX + (R + 50) * Math.cos(a);
+                const y2 = CY + (R + 50) * Math.sin(a);
+                rCtx.beginPath();
+                rCtx.moveTo(x1, y1);
+                rCtx.lineTo(x2, y2);
+                rCtx.stroke();
+            }
+
+            // Palabras clave giratorias
+            rCtx.font = "bold 6px 'Orbitron', sans-serif";
+            rCtx.fillStyle = shades[1];
+            rCtx.textAlign = "center";
+            rCtx.textBaseline = "middle";
+            FUNC_WORDS.forEach((word, i) => {
+                const a = (i * Math.PI / 2.5) + arcRotationAngle * 0.04;
+                const tx = CX + (R + 74) * Math.cos(a);
+                const ty = CY + (R + 74) * Math.sin(a);
+                rCtx.save();
+                rCtx.translate(tx, ty);
+                rCtx.rotate(a + Math.PI/2);
+                rCtx.fillText(word, 0, 0);
+                rCtx.restore();
+            });
+
+            // Anillo interno doble del reactor
+            rCtx.strokeStyle = shades[0];
+            rCtx.lineWidth = 2.5;
+            rCtx.beginPath();
+            rCtx.arc(CX, CY, R + 1, 0, Math.PI * 2);
+            rCtx.stroke();
+
+            // Anillo secundario punteado
+            rCtx.strokeStyle = shades[1];
+            rCtx.lineWidth = 1;
+            rCtx.setLineDash([4, 4]);
+            rCtx.beginPath();
+            rCtx.arc(CX, CY, R - 8, 0, Math.PI * 2);
+            rCtx.stroke();
+            rCtx.setLineDash([]);
+
+            // Barrido de arco luminoso de alta intensidad
+            const sw = 60 + 15 * Math.sin(arcRotationAngle * 1.5);
+            const ar = R + 28;
+            rCtx.strokeStyle = shades[0];
+            rCtx.lineWidth = 2.5;
+            rCtx.beginPath();
+            const startAngle = (arcRotationAngle * 57.3 - sw / 2) * Math.PI / 180;
+            const endAngle = (arcRotationAngle * 57.3 + sw / 2) * Math.PI / 180;
+            rCtx.arc(CX, CY, ar, startAngle, endAngle);
+            rCtx.stroke();
+
+            // Rótulo Central Holográfico
+            rCtx.fillStyle = shades[0];
+            rCtx.font = "bold 13px 'Orbitron', sans-serif";
+            rCtx.fillText("JARVIS", CX, CY - 4);
+
+            rCtx.fillStyle = shades[1];
+            rCtx.font = "bold 7px 'Orbitron', sans-serif";
+            rCtx.fillText("X20", CX, CY + 14);
+
+            // Ajuste de amplitud según el estado actual
+            if (currentState === "Escuchando") {
+                amplitude = 0.5 + 0.5 * Math.abs(Math.sin(frameCount * 0.3));
+            } else if (currentState === "Hablando") {
+                amplitude = 0.6 + 0.4 * Math.abs(Math.sin(frameCount * 0.5));
+            } else if (currentState === "Pensando") {
+                amplitude = 0.35 + 0.35 * Math.abs(Math.sin(frameCount * 0.1));
+            } else if (currentState === "Activo") {
+                amplitude = 0.03 + 0.03 * Math.abs(Math.sin(frameCount * 0.03));
+            } else {
+                amplitude *= 0.9;
+            }
+
+            // Chispas de energía (Sparks)
+            if (["Pensando", "Escuchando"].includes(currentState)) {
+                const rate = currentState === "Pensando" ? 2 : 4;
+                if (frameCount % 2 === 0) {
+                    for (let pIdx = 0; pIdx < rate; pIdx++) {
+                        const ang = Math.random() * Math.PI * 2;
+                        const dist = R + Math.random() * 120;
+                        const color = currentState === "Pensando" ? shades[0] : "#00f0ff";
+                        particles.push({
+                            x: CX + dist * Math.cos(ang),
+                            y: CY + dist * Math.sin(ang),
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: (Math.random() - 0.5) * 5 - 0.2,
+                            lifespan: 22,
+                            color: color
+                        });
+                    }
+                }
+            }
+
+            // Dibujar chispas de energía
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx * animationSpeed;
+                p.y += p.vy * animationSpeed;
+                p.lifespan -= 1 * animationSpeed;
+
+                if (p.lifespan <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                const s = 3.2 * (p.lifespan / 22);
+                rCtx.fillStyle = p.color;
+                rCtx.beginPath();
+                rCtx.arc(p.x, p.y, s, 0, Math.PI * 2);
+                rCtx.fill();
+            }
+
+            if (particles.length > particleDensity) {
+                particles = particles.slice(-(particleDensity - 20));
+            }
+
+            // Ondas ecualizadoras de espectro de voz (Hablando)
+            if (currentState === "Hablando") {
+                for (let i = 0; i < 14; i++) {
+                    const xo = -50 + i * 8 + 2;
+                    const h = 4 + 25 * Math.abs(Math.sin(arcRotationAngle * 2.2 + i * 0.3));
+                    const bx = CX + xo;
+                    const by = CY + R + 22;
+                    rCtx.fillStyle = shades[0];
+                    rCtx.fillRect(bx, by - h, 4, h);
+                }
+            }
+        }
+
+        // Activador de pulso de energía por doble click
+        arcReactorCanvas.addEventListener('dblclick', (e) => {
+            playSound('alert');
+            appendLog("[DIAGNÓSTICO]: Pulso EMP simulado. Relés magnéticos estables.");
+            
+            const shades = getShades(targetColor);
+            const rect = arcReactorCanvas.getBoundingClientRect();
+            const W = arcReactorCanvas.width / window.devicePixelRatio;
+            const H = arcReactorCanvas.height / window.devicePixelRatio;
+
+            for (let i = 0; i < 35; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                particles.push({
+                    x: W / 2,
+                    y: H / 2,
+                    vx: Math.cos(ang) * 6,
+                    vy: Math.sin(ang) * 6,
+                    lifespan: 30,
+                    color: shades[0]
+                });
+            }
+        });
+
+        // Eventos de arrastre para simulación de interacción táctil
+        let isDragging = false;
+        let lastX = 0;
+        arcReactorCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastX = e.clientX;
+        });
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const delta = e.clientX - lastX;
+                animationSpeed = Math.max(0.1, Math.min(2.5, animationSpeed + delta * 0.015));
+                document.getElementById('slider-speed').value = animationSpeed;
+                document.getElementById('speed-val').innerText = `${animationSpeed.toFixed(1)}x`;
+                lastX = e.clientX;
+            }
+        });
+
+        // Controladores de Sliders de configuración
+        document.getElementById('slider-speed').addEventListener('input', (e) => {
+            animationSpeed = parseFloat(e.target.value);
+            document.getElementById('speed-val').innerText = `${animationSpeed.toFixed(1)}x`;
+        });
+        document.getElementById('slider-density').addEventListener('input', (e) => {
+            particleDensity = parseInt(e.target.value);
+            document.getElementById('density-val').innerText = particleDensity;
+        });
+
+        // Bucle táctico maestro (Core Engine Tick)
+        function loop() {
+            frameCount++;
+
+            if (frameCount % 10 === 0) {
+                updateMetrics();
+            }
+
+            drawArcReactor();
+            drawPredictiveGraph();
+            drawSynapses();
+            drawGlobe();
+            drawStarship();
+            drawRadar();
+
+            const now = performance.now();
+            if (frameCount % 30 === 0) {
+                fps = Math.round(1000 / (now - lastFrameTime) * 30);
+                document.getElementById('footer-fps').innerText = fps;
+            }
+            lastFrameTime = now;
+
+            requestAnimationFrame(loop);
+        }
+
+        // Carga inicial de J.A.R.V.I.S.
+        window.onload = function() {
+            lucide.createIcons();
+            resizeCanvases();
+            initSynapses();
+            changeState('Activo');
+            appendLog("[SISTEMA]: Sensores ópticos y proyección de casco calibrados.");
+            appendLog("[AUTORIZADO]: Protocolo X20 plenamente operativo.");
+            
+            loop();
+        }
+    </script>
+</body>
+</html>
+
+
+1. El "Mapa Mundi" que giraNombre técnico: Globo de Estructura de Alambre 3D con Proyección Ortográfica (3D Wireframe Globe with Orthographic Projection).Cómo funciona en programación:Para dibujar este planeta en una pantalla plana (2D) sin usar motores pesados como Unity o Three.js, usamos trigonometría esférica.Se definen líneas de latitud (paralelos) y longitud (merididanos) mediante ángulos de rotación.Se utiliza una Matriz de Rotación para girar esos puntos virtuales en el espacio de 3 dimensiones usando una velocidad constante ($\theta$).Para proyectar el punto tridimensional $(x, y, z)$ en la pantalla bidimensional $(x, y)$, se utiliza una Proyección Ortográfica. Es decir, simplemente ignoramos o aplanamos la profundidad ($z$) para dibujar círculos y elipses que se estiran y encogen simulando una esfera en 3D:$$x_{\text{pantalla}} = CX + R \cdot \cos(\text{longitud} + \theta)$$$$y_{\text{pantalla}} = CY + R \cdot \sin(\text{latitud})$$2. La "Red Neuronal"Nombre técnico: Efecto Constelación o Grafo Dinámico de Partículas (Constellation Effect / Dynamic Particle Node-Link Graph).Cómo funciona en programación:Este sistema consta de dos algoritmos simples pero muy estéticos:Motor de física de partículas básico: Cada "nodo" (punto) es una partícula independiente que tiene una posición $(x, y)$ y un vector de velocidad $(v_x, v_y)$. En cada fotograma, sumamos la velocidad a la posición y aplicamos una colisión elástica con los bordes (hacer que "reboten" multiplicando su velocidad por $-1$ si tocan los límites del panel).Cálculo de Distancia Euclidiana (Enlace de Grafo): En cada ciclo de dibujado, un bucle compara la distancia entre cada par de puntos usando el teorema de Pitágoras:$$\text{distancia} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$Si la distancia es menor a un umbral (por ejemplo, $45$ píxeles), el programa dibuja una línea (canvas.create_line) entre ellos. Si están muy lejos, la línea no se dibuja. Esto crea el efecto orgánico de conexiones neuronales que se crean y destruyen.3. El "Círculo" central que se mueve (Reactor Arc)Nombre técnico: Renderizado de Vectores en Coordenadas Polares y Arcos de Barrido (Polar Coordinates Vector Rendering & Sweep Arcs).Cómo funciona en programación:En lugar de usar las coordenadas de cuadrícula normales (Cartesianas: $X, Y$), las animaciones circulares se programan usando Coordenadas Polares, las cuales se definen por un radio ($R$) y un ángulo ($\theta$).Para dibujar los arcos giratorios segmentados, se utilizan comandos nativos del Canvas como create_arc, alterando sus ángulos de inicio y extensión en cada fotograma.Para colocar las palabras (ANALYZE, ADAPT, etc.) o las líneas radiales que rotan alrededor del círculo, el código realiza una conversión de coordenadas polares a cartesianas en cada ciclo de animación para saber exactamente en qué píxel de la pantalla debe pintar el elemento:$$X = CX + R \cdot \cos(\theta)$$$$Y = CY + R \cdot \sin(\theta)$$4. Las "Chispas" o partículas que salen del centroNombre técnico: Sistema de Partículas (Particle System).Cómo funciona en programación:Es una técnica clásica de videojuegos para simular fuego, humo, explosiones o, en este caso, energía Stark.Se define un objeto o diccionario con variables de Posición $(x, y)$, Velocidad $(v_x, v_y)$, Ciclo de vida (Lifespan/Decay) y Color.Cada vez que se activa (por ejemplo, al procesar o hacer doble click), el programa genera una ráfaga de estas partículas con direcciones y velocidades aleatorias utilizando la función random.uniform.En cada iteración, se reduce la duración de vida de la partícula. A medida que se agota su tiempo de vida, su tamaño disminuye proporcionalmente (rad_p = 3.2 * (duracion / 22)) y finalmente se elimina de la lista de memoria para evitar que la computadora se sature.5. La Nave en 3DNombre técnico: Renderizado de Malla de Estructura de Alambre 3D (3D Wireframe Mesh Rendering).Cómo funciona en programación:Se basa en geometría pura:Vértices: Una lista de coordenadas fijas en 3D que representan los puntos clave del caza estelar.Aristas (Edges): Una lista de conexiones que indica qué puntos deben unirse con líneas (por ejemplo, el vértice 0 se une con el 1).Aplicamos matrices de rotación en los ejes X, Y y Z para rotar la figura en el espacio y luego proyectamos esos puntos proyectados en las 2 dimensiones del Canvas.6. La obtención y visualización de "Datos" realesNombre técnico: Sondeo de Telemetría del Sistema (Hardware Telemetry Polling / System Resource Monitoring).Cómo funciona en programación:Para la CPU, RAM y Disco, el código utiliza llamadas al sistema operativo mediante la librería psutil (Process and System Utilities). Esto es un sondeo (polling), lo que significa que el programa pregunta periódicamente al sistema operativo por su estado actual.El gráfico predictivo que dibuja la fluctuación de la CPU se conoce como Gráfico de Línea de Búfer Circular o Gráfico de Historial Desplazado (Rolling Line Chart). Funciona manteniendo una lista con un tamaño máximo fijo (25 elementos). En cada actualización, el dato más antiguo se elimina de la lista con .pop(0) y el nuevo se añade al final con .append(), haciendo que la gráfica parezca desplazarse hacia la izquierda continuamente.
+
+Como este puede tener datos reales de la aplicacion, por ejemplo 
+En el mapa mundo marcando la ubicación que me encuentro en la tierra y otros lugares de interes.
+
+Marcar los programas que estan activos y como se relacionan.
+Que programas estan activos. etc.
+
+El El "Círculo" central que se mueve (Reactor Arc) Si hay algun programas que estan consumiendo muchos recursos que esten en Rojo su nombre dentro de la linea y el color semaforico. 
+
+4. Las "Chispas" o partículas que salen del centro si hay intrusos ingresando en la PC, Color Rojo y Naranjado cuando la tarea fue culminada.
+
+. La Nave en 3D
+Nombre técnico: Renderizado de Malla de Estructura de Alambre 3D (3D Wireframe Mesh Rendering). decir que IA se esta usando y con que programa, y otro datos.
+
+Aplicar al Uso de la PC, que hace en que parte. 
+
+No modificar diseño, darle funcionalidad real. 

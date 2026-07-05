@@ -1,0 +1,108 @@
+{
+    "positions": {
+        "core": [
+            16,
+            116
+        ],
+        "neural": [
+            16,
+            253
+        ],
+        "nebula": [
+            16,
+            390
+        ],
+        "env": [
+            16,
+            527
+        ],
+        "pred": [
+            160,
+            116
+        ],
+        "threat": [
+            160,
+            253
+        ],
+        "diag": [
+            160,
+            390
+        ],
+        "reactor": [
+            180,
+            116
+        ],
+        "tactical": [
+            220,
+            390
+        ],
+        "console": [
+            0,
+            658
+        ],
+        "input_bar": [
+            70,
+            658
+        ]
+    },
+    "positions_exp": {
+        "core": [
+            16,
+            116
+        ],
+        "neural": [
+            16,
+            253
+        ],
+        "nebula": [
+            16,
+            390
+        ],
+        "env": [
+            16,
+            527
+        ],
+        "pred": [
+            926,
+            116
+        ],
+        "threat": [
+            926,
+            253
+        ],
+        "diag": [
+            926,
+            390
+        ],
+        "reactor": [
+            471,
+            116
+        ],
+        "tactical": [
+            471,
+            390
+        ],
+        "console": [
+            16,
+            658
+        ],
+        "input_bar": [
+            986,
+            658
+        ]
+    },
+    "visibility": {
+        "core": "full",
+        "neural": "full",
+        "nebula": "full",
+        "env": "full",
+        "pred": "compact",
+        "threat": "full",
+        "diag": "full",
+        "reactor": "full",
+        "input_bar": "full",
+        "console": "full",
+        "tactical": "full"
+    },
+    "theme_color": "#00e5ff"
+}

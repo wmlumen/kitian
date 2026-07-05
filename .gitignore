@@ -1,0 +1,25 @@
+# Nunca subir a GitHub
+.env
+*.log
+kitian_config.json
+pendientes.txt
+*.pyc
+__pycache__/
+datos_red.json
+backup_*
+respuesta_cruda_*
+credentials_gmail.json
+token_gmail.json
+*.db
+*.db-shm
+*.db-wal
+*.bak
+*copia*
+.venv*
+imagen/
+Imagen_decrecimiento/
+matrix/
+mis_documentos/
+piper_models/
+*.zip
+C:*/

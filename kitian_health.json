@@ -1,0 +1,491 @@
+{
+  "app": "Kitian",
+  "schema_version": "1.0",
+  "generated_at": "2026-07-04 15:57:25",
+  "status": "DEGRADED",
+  "score": 0,
+  "summary": "11 anomalía(s) abierta(s). CPU 24.7% | RAM 67.0% | Disco 59.1%.",
+  "environment": {
+    "cwd": "C:\\Temp\\kitian",
+    "hostname": "DESKTOP-722CNSO",
+    "python": "3.14.4",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "metrics": {
+    "cpu_percent": 24.7,
+    "ram_percent": 67.0,
+    "disk_percent": 59.1
+  },
+  "components": [
+    {
+      "name": "Core Manifest",
+      "status": "OK",
+      "detail": "OK",
+      "checks": [
+        {
+          "name": "manifest.json",
+          "ok": true,
+          "severity": "OK",
+          "detail": "OK"
+        },
+        {
+          "name": "Proyecto activo",
+          "ok": true,
+          "severity": "MEDIUM",
+          "detail": "Test Core 2"
+        }
+      ]
+    },
+    {
+      "name": "HUD Layout",
+      "status": "OK",
+      "detail": "OK",
+      "checks": [
+        {
+          "name": "hud_layout.json",
+          "ok": true,
+          "severity": "OK",
+          "detail": "OK"
+        },
+        {
+          "name": "preview.html",
+          "ok": true,
+          "severity": "MEDIUM",
+          "detail": "Dashboard HTML presente"
+        }
+      ]
+    },
+    {
+      "name": "Red de Conocimiento",
+      "status": "WARN",
+      "detail": "datos_red.json aún no creado",
+      "checks": [
+        {
+          "name": "datos_red.json",
+          "ok": false,
+          "severity": "LOW",
+          "detail": "No existe: datos_red.json"
+        },
+        {
+          "name": "Nodos",
+          "ok": true,
+          "severity": "LOW",
+          "detail": "0"
+        },
+        {
+          "name": "Aristas",
+          "ok": true,
+          "severity": "LOW",
+          "detail": "0"
+        }
+      ]
+    },
+    {
+      "name": "Plugins",
+      "status": "OK",
+      "detail": "1/1 habilitados",
+      "checks": [
+        {
+          "name": "Plugins detectados",
+          "ok": true,
+          "severity": "OK",
+          "detail": "1"
+        },
+        {
+          "name": "Comandos cargados",
+          "ok": true,
+          "severity": "OK",
+          "detail": "1"
+        }
+      ]
+    },
+    {
+      "name": "LM Studio / IA",
+      "status": "DEGRADED",
+      "detail": "No responde en localhost:1234",
+      "checks": [
+        {
+          "name": "kitian_config.json",
+          "ok": true,
+          "severity": "OK",
+          "detail": "OK"
+        },
+        {
+          "name": "HTTP localhost:1234",
+          "ok": false,
+          "severity": "HIGH",
+          "detail": "Sin respuesta"
+        },
+        {
+          "name": "Backend configurado",
+          "ok": true,
+          "severity": "LOW",
+          "detail": "nous"
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "status": "DEGRADED",
+      "detail": "5 issue(s) reciente(s)",
+      "checks": [
+        {
+          "name": "kitian.log",
+          "ok": true,
+          "severity": "OK",
+          "detail": "Presente"
+        },
+        {
+          "name": "Errores recientes",
+          "ok": false,
+          "severity": "HIGH",
+          "detail": "5"
+        }
+      ]
+    },
+    {
+      "name": "Sistema",
+      "status": "OK",
+      "detail": "CPU 24.7% | RAM 67.0% | Disco 59.1%",
+      "checks": [
+        {
+          "name": "CPU",
+          "ok": true,
+          "severity": "MEDIUM",
+          "detail": "24.7%"
+        },
+        {
+          "name": "RAM",
+          "ok": true,
+          "severity": "MEDIUM",
+          "detail": "67.0%"
+        },
+        {
+          "name": "Disco",
+          "ok": true,
+          "severity": "MEDIUM",
+          "detail": "59.1%"
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "id": "28feae32e450e1dc",
+      "component": "LM Studio",
+      "severity": "HIGH",
+      "title": "Sin conexión con LM Studio",
+      "detail": "No responde en http://localhost:1234/v1/models",
+      "recommendation": "Abrir LM Studio o cambiar backend en kitian_config.json.",
+      "source": "kitian_health_probe.py",
+      "first_seen": "2026-06-02 18:58:00",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 55,
+      "status": "OPEN"
+    },
+    {
+      "id": "f930c15989e364ec",
+      "component": "Logs",
+      "severity": "HIGH",
+      "title": "Evento reciente en log",
+      "detail": "2026-05-30 11:52:49 [ERROR] Error al iniciar HUD: name 'self' is not defined",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-02 18:58:00",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 28,
+      "status": "OPEN"
+    },
+    {
+      "id": "eef5a709124edf30",
+      "component": "Logs",
+      "severity": "HIGH",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-02 17:54:49 [ERROR] Error al iniciar HUD: name 'self' is not defined",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-02 18:58:00",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 28,
+      "status": "OPEN"
+    },
+    {
+      "id": "a28b3dd02504f5de",
+      "component": "Logs",
+      "severity": "HIGH",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-02 18:09:13 [ERROR] Error al iniciar HUD: name 'self' is not defined",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-02 18:58:00",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 29,
+      "status": "OPEN"
+    },
+    {
+      "id": "e8bdbf156d6cad54",
+      "component": "Logs",
+      "severity": "HIGH",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-29 15:23:49 [ERROR] Intento 1/3: Connection error.",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-29 16:14:40",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 51,
+      "status": "OPEN"
+    },
+    {
+      "id": "59caa92db3051dae",
+      "component": "Logs",
+      "severity": "HIGH",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-29 15:24:04 [ERROR] Intento 2/3: Connection error.",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-29 16:14:40",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 51,
+      "status": "OPEN"
+    },
+    {
+      "id": "27221b9b1b9ee5d7",
+      "component": "Logs",
+      "severity": "HIGH",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-29 15:24:21 [ERROR] Intento 3/3: Connection error.",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-29 16:14:40",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 51,
+      "status": "OPEN"
+    },
+    {
+      "id": "20a2ed29e2ea8b41",
+      "component": "Logs",
+      "severity": "MEDIUM",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-02 17:42:01 [WARNING] Todas las APIs de clima fallaron para Asuncion",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-02 18:58:00",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 28,
+      "status": "OPEN"
+    },
+    {
+      "id": "4d6e27fe95db4d09",
+      "component": "Logs",
+      "severity": "MEDIUM",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-02 17:42:02 [WARNING] Todas las APIs de clima fallaron para Asuncion",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-02 18:58:00",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 28,
+      "status": "OPEN"
+    },
+    {
+      "id": "d7f3e45ce64c6137",
+      "component": "Logs",
+      "severity": "MEDIUM",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-29 15:22:16 [WARNING] KITIAN_API_KEY no definida en .env para backend nous",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-29 16:14:40",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 51,
+      "status": "OPEN"
+    },
+    {
+      "id": "7c74f6af0fb07e40",
+      "component": "Logs",
+      "severity": "MEDIUM",
+      "title": "Evento reciente en log",
+      "detail": "2026-06-29 15:24:21 [WARNING] Modo offline activado por fallo de API",
+      "recommendation": "Revisar kitian.log y el módulo fuente.",
+      "source": "kitian.log",
+      "first_seen": "2026-06-29 16:14:40",
+      "last_seen": "2026-07-04 15:57:25",
+      "hits": 51,
+      "status": "OPEN"
+    }
+  ],
+  "recommendations": [
+    "Abrir LM Studio o cambiar backend en kitian_config.json.",
+    "Revisar kitian.log y el módulo fuente."
+  ],
+  "history": [
+    {
+      "generated_at": "2026-06-02 18:58:00",
+      "status": "DEGRADED",
+      "score": 40,
+      "open_anomalies": 6
+    },
+    {
+      "generated_at": "2026-06-29 15:22:10",
+      "status": "DEGRADED",
+      "score": 40,
+      "open_anomalies": 6
+    },
+    {
+      "generated_at": "2026-06-29 16:14:40",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 16:26:35",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 16:27:06",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 16:43:57",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 16:46:18",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 17:24:37",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 17:27:01",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 18:40:23",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 18:41:18",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 18:45:19",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 18:53:53",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 18:59:13",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 19:08:33",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 19:11:49",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 19:14:21",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 19:17:30",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 19:24:21",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 19:48:09",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 21:03:00",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-29 21:35:23",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-06-30 19:42:20",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-07-04 02:05:12",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-07-04 02:08:20",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-07-04 02:16:25",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-07-04 02:18:39",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    },
+    {
+      "generated_at": "2026-07-04 15:57:25",
+      "status": "DEGRADED",
+      "score": 0,
+      "open_anomalies": 11
+    }
+  ]
+}
