@@ -11,7 +11,7 @@ log = logging.getLogger("kitian")
 
 # ─── Catálogo de backends gratuitos en orden de preferencia ──────────────────
 # Kitian probará cada uno en orden hasta encontrar uno con clave configurada.
-# Si ninguno tiene clave, cae a LM Studio local.
+# Si ninguno tiene clave, cae a modo local sin cliente OpenAI.
 BACKEND_CATALOG = [
     {
         "name": "gemini",
@@ -62,7 +62,7 @@ def cargar_env():
         load_dotenv(BASE_DIR / ".env")
         log.info(".env cargado")
     except ImportError:
-        log.info("python-dotenv no instalado, usando variables de entorno del sistema")
+        log.info("python-dotenv no instalado, usando variables del sistema")
 
 
 cargar_env()
@@ -83,56 +83,47 @@ def cargar_config():
 config = cargar_config()
 
 
-def _resolver_backend():
-    """Resuelve el backend activo según config y claves disponibles.
-    
-    Orden:
-    1. Si config[backend] == 'auto' → prueba cada backend en BACKEND_CATALOG
-       y usa el primero que tenga clave.
-    2. Si config[backend] es un nombre específico → lo usa directamente.
-    3. Fallback final: Google Gemini / nube gratuita.
-    """
+def _noop_client():
+    class _X:
+        class chat:
+            class completions:
+                @staticmethod
+                def create(*a, **k):
+                    raise RuntimeError("Sin API keys: cliente IA desactivado.")
+    return _X()
+
+
+def crear_cliente():
+    fb = LOCAL_FALLBACK
     backend_cfg = config.get("backend", "auto")
     model_cfg = config.get("model", "auto")
 
-    # Nombre explícito en config
     if backend_cfg not in ("auto", "local", "lmstudio", "", None):
         for b in BACKEND_CATALOG:
             if b["name"] == backend_cfg:
-                key = os.getenv(b["env_key"], "") if b["env_key"] else ""
+                key = os.getenv(b["env_key"] or "", "")
                 if not key:
                     log.warning(
-                        "Backend '%s' configurado pero %s no está en .env → "
-                        "obtené tu clave gratis en: %s",
+                        "Backend '%s' configurado pero %s no está en .env -> "
+                        "obtené tu clave en: %s",
                         b["name"], b["env_key"], b.get("get_key_url", ""),
                     )
                 model = model_cfg if model_cfg not in ("auto", "", None) else b["model"]
                 return OpenAI(base_url=b["base_url"], api_key=key or "no-key"), model, b["name"]
 
-    # Auto: primer backend con clave disponible
-    if backend_cfg in ("auto", "local", "lmstudio"):
-        for b in BACKEND_CATALOG:
-            key = os.getenv(b["env_key"] or "", "") if b["env_key"] else None
-            if key:
-                log.info("Backend auto-seleccionado: %s", b["label"])
-                model = b["model"]
-                return OpenAI(base_url=b["base_url"], api_key=key), model, b["name"]
-        log.warning(
-            "No hay claves de API configuradas. Usando Google Gemini (nube).\n"
-            "Para activar IA gratuita agrega tus claves en C:\\Temp\\kitian\\.env:\n"
-            "  GEMINI_API_KEY  → https://aistudio.google.com/apikey (gratis)\n"
-            "  GROQ_API_KEY    → https://console.groq.com/keys (gratis)\n"
-            "  KITIAN_API_KEY  → https://inference-api.nousresearch.com (gratis)"
-        )
+    for b in BACKEND_CATALOG:
+        key = os.getenv(b["env_key"] or "", "")
+        if key:
+            log.info("Backend auto-seleccionado: %s", b["label"])
+            model = model_cfg if model_cfg not in ("auto", "", None) else b["model"]
+            return OpenAI(base_url=b["base_url"], api_key=key), model, b["name"]
 
-    # Fallback nube (sin requerir recursos locales)
-    fb = LOCAL_FALLBACK
-    key_fb = os.getenv(fb["env_key"] or "", "no-key") if fb["env_key"] else "no-key"
-    return OpenAI(base_url=fb["base_url"], api_key=key_fb), fb["model"], fb["name"]
-
-
-def crear_cliente():
-    return _resolver_backend()
+    log.warning(
+        "Sin API keys: se fuerza modo local (sin proveedor de IA).\n"
+        "Agregá tus claves en C:\\Temp\\kitian\\.env: "
+        "GEMINI_API_KEY, GROQ_API_KEY, KITIAN_API_KEY."
+    )
+    return _noop_client(), fb["model"], "local"
 
 
 client, current_model, active_backend = crear_cliente()
