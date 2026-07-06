@@ -37,28 +37,8 @@ def _init_state():
     log.info("Estado inicializado: Activo")
 
 
-# ─── 3. Hilo de voz y escucha ────────────────────────────────────────────────
-def _worker_voz():
-    """Hilo que escucha continuamente y despacha comandos."""
-    log.info("Hilo de voz arrancado — esperando comandos...")
-    state.set("Escuchando", state.COLORES.get("escuchando", "#00cc66"))
-    while True:
-        try:
-            texto = escuchar_continuo()
-            if texto:
-                if isinstance(texto, tuple):
-                    _, texto = texto
-                if texto:
-                    log.info("Comando recibido: %s", texto)
-                    state.set("Pensando", state.COLORES.get("pensando", "#ffcc00"))
-                    try:
-                        procesar(texto)
-                    except Exception as e:
-                        log.error("Error al procesar comando: %s", e)
-                    state.set("Escuchando", state.COLORES.get("escuchando", "#00cc66"))
-        except Exception as e:
-            log.debug("escuchar_continuo: %s", e)
-            time.sleep(0.5)
+# ─── 3. Hilo de voz y escucha (Desactivado por sobrecalentamiento) ──────────────
+# La escucha ahora se activa únicamente mediante la tecla de acceso rápido.
 
 
 # ─── 4. Hilo del servidor HTTP ───────────────────────────────────────────────
@@ -67,12 +47,12 @@ def _worker_http():
     try:
         import kitian_http_standalone_real as _srv
         import socket as _socket
-        from http.server import HTTPServer
+        from http.server import HTTPServer, ThreadingHTTPServer
 
         bind_host = "0.0.0.0"
         port = int(__import__("os").environ.get("KITIAN_PORT", "8080"))
         try:
-            server = HTTPServer((bind_host, port), _srv.Handler)
+            server = ThreadingHTTPServer((bind_host, port), _srv.Handler)
             server.socket.setsockopt(_socket.SOL_SOCKET, _socket.SO_REUSEADDR, 1)
             log.info("Servidor HTTP activo → http://localhost:%s/", port)
             server.serve_forever()
@@ -82,17 +62,38 @@ def _worker_http():
         log.warning("HTTP standalone no pudo iniciarse: %s", e)
 
 
-# ─── 5. Hotkey Ctrl+Space ────────────────────────────────────────────────────
+# ─── 5. Hotkey Espacio (Push-to-Talk) ─────────────────────────────────────────
 def _init_hotkey():
     try:
         import keyboard
+        import threading
+        from kitian.audio import escuchar_comando
+        from kitian.dispatcher import procesar
+
+        def _listen_task():
+            log.info("Escuchando comando (activado por Espacio)...")
+            try:
+                texto = escuchar_comando(timeout=8)
+                if isinstance(texto, tuple):
+                    _, texto = texto
+                if texto:
+                    log.info("Comando recibido: %s", texto)
+                    state.set("Pensando", state.COLORES.get("pensando", "#ffcc00"))
+                    procesar(texto)
+                state.set("Activo", state.COLORES.get("activo", "#00ffff"))
+            except Exception as e:
+                log.error("Error al procesar comando por voz: %s", e)
+                state.set("Activo", state.COLORES.get("activo", "#00ffff"))
 
         def _activar():
-            log.info("Ctrl+Space activado")
+            # Evitar lanzar multiples hilos si ya esta escuchando
+            if state.get("Escuchando") == state.COLORES.get("escuchando", "#00cc66"):
+                return
             state.set("Escuchando", state.COLORES.get("escuchando", "#00cc66"))
+            threading.Thread(target=_listen_task, daemon=True).start()
 
         keyboard.add_hotkey("ctrl+space", _activar)
-        log.info("Hotkey Ctrl+Space registrada")
+        log.info("Hotkey 'Ctrl+Espacio' registrada para escuchar comandos")
     except Exception:
         log.info("Libreria keyboard no disponible (pip install keyboard)")
 
@@ -118,13 +119,13 @@ def main():
 
     # Voz inicial (no bloquea el HUD — en hilo separado)
     threading.Thread(
-        target=lambda: hablar("Sistema Kitian operativo.", blocking=True),
+        target=lambda: hablar("Sistema Kitian operativo. Presiona Control más Espacio para hablar.", blocking=True),
         daemon=True,
         name="voz-inicio",
     ).start()
 
-    # Worker de escucha en segundo plano
-    threading.Thread(target=_worker_voz, daemon=True, name="voz-worker").start()
+    # Worker de escucha continuo desactivado (usar espacio para hablar)
+    # threading.Thread(target=_worker_voz, daemon=True, name="voz-worker").start()
 
     # HUD — debe correr en el hilo principal (Tkinter)
     log.info("Iniciando HUD visual...")
