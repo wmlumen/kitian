@@ -7,7 +7,7 @@ import os
 import platform
 import subprocess
 import shlex
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
 import http.client
 
 # ---------- Auto-detect best local IP ----------
@@ -39,7 +39,8 @@ _start_time = time.time()
 def _get_system_metrics():
     try:
         import psutil
-        cpu = psutil.cpu_percent(interval=0.1)
+        # Cambiado a interval=None para no bloquear el hilo (evita un sleep de 100ms)
+        cpu = psutil.cpu_percent(interval=None)
         ram = psutil.virtual_memory()
         disk = psutil.disk_usage('C:\\' if platform.system() == 'Windows' else '/').percent
 
@@ -539,7 +540,7 @@ if __name__ == "__main__":
     bind_host = "0.0.0.0"
     display_host = HOST  # IP detectada para mostrar al usuario
     try:
-        server = HTTPServer((bind_host, PORT), Handler)
+        server = ThreadingHTTPServer((bind_host, PORT), Handler)
     except OSError as e:
         print(f"[HTTP] Error al iniciar servidor: {e}")
         raise
@@ -561,11 +562,15 @@ if __name__ == "__main__":
     print(f"  +==================================================+")
     print(f"")
 
-    try:
-        from kitian.voice_gateway import start_background as _start_voice_gw
-        _start_voice_gw()
-    except Exception as e:
-        print("[VoiceGW] No pude iniciar:", e)
+    # Evitar iniciar el Voice Gateway si estamos en Render o Docker
+    if not os.path.exists("/.dockerenv") and not os.environ.get("RENDER"):
+        try:
+            from kitian.voice_gateway import start_background as _start_voice_gw
+            _start_voice_gw()
+        except Exception as e:
+            print("[VoiceGW] No pude iniciar:", e)
+    else:
+        print("[VoiceGW] Desactivado automáticamente (entorno de nube o contenedor detectado)")
 
     try:
         server.serve_forever()
