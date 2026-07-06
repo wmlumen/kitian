@@ -98,7 +98,7 @@
         "env": "full",
         "pred": "compact",
         "threat": "full",
-        "diag": "full",
+        "diag": "compact",
         "reactor": "full",
         "input_bar": "full",
         "console": "full",

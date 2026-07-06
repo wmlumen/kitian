@@ -16,14 +16,14 @@
     "recent_goals": [],
     "frequency_keywords": {
       "hola": 4,
-      "podes": 2,
+      "podes": 3,
       "hablar": 1,
       "por": 1,
       "voz": 1,
       "buen": 1,
       "dia": 1,
-      "clima": 3,
-      "paraguay": 4,
+      "clima": 4,
+      "paraguay": 5,
       "bibliografia": 1,
       "cerati": 1,
       "escuchas": 1,
@@ -31,8 +31,10 @@
       "las": 2,
       "ciudades": 2,
       "modificarte": 1,
-      "desde": 1,
-      "aca": 1
+      "desde": 2,
+      "aca": 2,
+      "mejorar": 1,
+      "kitian": 1
     },
     "last_interactions": [
       {
@@ -112,6 +114,18 @@
         "text": "podes modificarte desde aca",
         "ts": 1783268215.1647375,
         "extra": {}
+      },
+      {
+        "kind": "command",
+        "text": "clima en Paraguay",
+        "ts": 1783276900.1322508,
+        "extra": {}
+      },
+      {
+        "kind": "command",
+        "text": "podes mejorar kitian desde aca",
+        "ts": 1783287317.107685,
+        "extra": {}
       }
     ]
   },
@@ -122,6 +136,6 @@
   },
   "meta": {
     "created_at": 1783085315.0858247,
-    "updated_at": 1783268215.1680403
+    "updated_at": 1783287317.1099515
   }
 }
